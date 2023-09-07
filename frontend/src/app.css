@@ -1,0 +1,47 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html, 
+body {
+    height: 100vh;
+}
+.svelecte input:focus {
+    outline: none !important;
+
+}
+.collapse {
+    visibility: visible !important;
+}
+@layer base {
+    h1 {
+      @apply text-2xl;
+    }
+    h2 {
+      @apply text-xl;
+    }
+    h3 {
+      @apply text-lg;
+    }
+    h4 {
+      font-weight: bold;
+      text-decoration: underline;
+    }
+    ol {
+      @apply list-decimal;
+      margin-block-start: 1em;
+      margin-block-end: 1em;
+      margin-inline-start: 0px;
+      margin-inline-end: 0px;
+      padding-inline-start: 30px;  
+    }
+    ul {
+      @apply list-outside;
+      @apply list-disc;
+      margin-block-start: 1em;
+      margin-block-end: 1em;
+      margin-inline-start: 0px;
+      margin-inline-end: 0px;
+      padding-inline-start: 30px;  
+    }
+  }

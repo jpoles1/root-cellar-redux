@@ -1,0 +1,1 @@
+declare module '@opendocsg/pdf2md';
