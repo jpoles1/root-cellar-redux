@@ -73,7 +73,7 @@
         }
         toast.push("Saved Recipe!", {classes: ["success"]})
     }
-    let save_debounce = debounce(save_recipe, 2000, 0)
+    let save_debounce = debounce(save_recipe, 15000, 0)
     const try_save_recipe = () => {
         save_debounce()
         console.log("SAVEW")
@@ -121,6 +121,22 @@
         // Save updates
         try_save_recipe();
     }
+    const ingredient_delete_watch = (i: number, e: KeyboardEvent) => {
+        if (e.key === 'Backspace') {
+            if (recipe.ingredients[i].ingredient == "") {
+                recipe.ingredients.splice(i, 1);
+                recipe.ingredients = [...recipe.ingredients]
+            }
+        }
+    }
+    const instruction_delete_watch = (i: number, e: KeyboardEvent) => {
+        if (e.key === 'Backspace') {
+            if (recipe.instructions[i].instruction == "") {
+                recipe.instructions.splice(i, 1);
+                recipe.instructions = [...recipe.instructions]
+            }
+        }
+    }
 
     onMount(async () => {
         console.log(recipeid)
@@ -140,6 +156,8 @@
         save_recipe()
     })
 </script>
+
+<svelte:window on:beforeunload={save_recipe} />
 
 <div> 
     {#if recipe}
@@ -188,7 +206,7 @@
                     <button class="italic text-blue-500 underline" on:click="{toggle_raw_ingredients}">Show {show_raw_ingredients ? "WYSIWG" : "Raw"}</button>
                     <hr class="my-5">
                     {#if show_raw_ingredients}
-                        <AutoTextArea bind:value="{raw_ingredients}" class="ingredient-notes-input w-full" on:input="{try_save_recipe}"/>
+                        <AutoTextArea bind:value="{raw_ingredients}" on:input="{try_save_recipe}"/>
                     {:else}
                         {#each recipe.ingredients as ingred, i}
                             <div class="mb-4">
@@ -198,7 +216,11 @@
                                     <input bind:value="{ingred.ingredient}" class="input text-center h-8 ingredient-ingredient-input" on:input="{try_save_recipe}" placeholder="Ingredient Name (bksp to clear)" v-on:keyup.delete="e => check_empty_ingredient(e, ingredIndex)" />
                                     <br />
                                 </div>
-                                <textarea bind:value="{ingred.notes}" class="ingredient-notes-input p-1" placeholder="Notes" rows="1" />
+                                <div class="flex justify-center">
+                                    <div class=" w-[440px]">
+                                        <AutoTextArea bind:value="{ingred.notes}" placeholder="Notes" on:input="{try_save_recipe}"/>
+                                    </div>
+                                </div>
                             </div>
                         {/each}
                         <button class="btn btn-info" on:click="{add_ingredient}">
@@ -223,7 +245,7 @@
                                     <!--Opt: <input type="checkbox" class="checkbox"/>-->
                                     <button class="btn btn-xs" on:click="{() => {instruct.optional = !instruct.optional}}">{instruct.optional ? 'Optional' : 'Required'}</button>
                                 </div>
-                                <textarea bind:value="{instruct.instruction}" auto-grow rows="2" class="instruction-instruction-textarea p-4 w-full" placeholder="Instructions..." v-on:keyup.delete="e => check_empty_instruction(e, instructionIndex)" />
+                                <AutoTextArea bind:value="{instruct.instruction}" placeholder="Instructions..." class="ingredient-notes-input p-1" on:keyup="{(e) => { instruction_delete_watch(i, e) }}" on:input="{try_save_recipe}"/>
                             </div>
                         {/each}
                         <v-btn on:click="{add_instruction}" class="btn btn-info">
@@ -262,7 +284,7 @@
 	margin: 12px 0;
 }
 .ingredient-ingredient-input {
-	width: min(100%, 280px);
+	width: 280px;
 }
 .ingredient-notes-input textarea {
 	padding: 5px 8px !important;

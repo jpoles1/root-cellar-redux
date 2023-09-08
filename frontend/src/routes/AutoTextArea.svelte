@@ -9,7 +9,7 @@ interface $$Props extends HTMLTextareaAttributes {
 }
 
 export let value = '';
-export let minRows: number | undefined = 2;
+export let minRows: number | undefined = 1;
 export let maxRows: number | undefined = 20;
 
 import ProxyTextareaElement from "./core";
@@ -26,10 +26,6 @@ $: {
 onDestroy(() => {
   instance.cleanUp();
 });
-
-import { createEventDispatcher } from 'svelte';
-const dispatch = createEventDispatcher();
-
 </script>
 
-<textarea {...$$props} bind:this={element} bind:value={value} class="textarea overflow-auto w-full" on:input="{(e) => dispatch("input", e)}"/>
+<textarea {...$$props} bind:this={element} bind:value={value} class="rounded-sm border border-black overflow-auto w-full p-2 pr-6" on:input on:change on:keydown on:keyup/>

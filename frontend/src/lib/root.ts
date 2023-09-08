@@ -47,7 +47,7 @@ export class Recipe {
 
     ingredients_to_txt(): string {
         const raw_ingred = this.ingredients.reduce((agg, ing, i): string => {
-            return agg + `\n${ing.quantity}${ing.unit ? ' ' + ing.unit : ''} ${ing.ingredient}`
+            return agg + `\n${ing.quantity}${ing.unit ? ' ' + ing.unit : ''} of ${ing.ingredient}`
         }, "").trim()
 
         return raw_ingred
