@@ -93,26 +93,28 @@
         recipe = new Recipe(await pb.collection("recipes").update(recipe.id, {'pics-': [pic]}))
     }
 
-    const rearrange_instructions = (i, e) => {
-        let newi = parseInt(e.target.value)
+    const rearrange_instructions = (i: number, e: Event) => {
+        const etarget = e.target as any
+        let newi = parseInt(etarget.value)
         if (isNaN(newi)) return;
         newi--;
         if (recipe === undefined) return;
         // Blur input
-        e.target.blur();
+        etarget.blur();
         // Rearranges instruction array
         recipe.instructions.splice(newi, 0, recipe.instructions.splice(i, 1)[0]);
         recipe.instructions = [...recipe.instructions]
         // Save updates
         try_save_recipe();
     }
-    const rearrange_pics = (i, e) => {
-        let newi = parseInt(e.target.value)
+    const rearrange_pics = (i: number, e: Event) => {
+        const etarget = e.target as any
+        let newi = parseInt(etarget.value)
         if (isNaN(newi) || !recipe.pics) return;
         newi--;
         if (recipe === undefined) return;
         // Blur input
-        e.target.blur();
+        etarget.blur();
         // Rearranges instruction array
         recipe.pics.splice(newi, 0, recipe.pics.splice(i, 1)[0]);
         recipe.pics = [...recipe.pics]
@@ -128,7 +130,7 @@
             add_instruction()
         } else {
             recipe = new Recipe(await pb.collection("recipes").getOne(recipeid))
-            if (recipe.uid != $uaccount.id) goto("/")
+            if ($uaccount && recipe.uid != $uaccount.id) goto("/")
         }
         raw_ingredients = regen_raw_ingredients()
         raw_instructions = regen_raw_instructions()
@@ -191,12 +193,12 @@
                         {#each recipe.ingredients as ingred, i}
                             <div class="mb-4">
                                 <div class="flex justify-center">
-                                    <input bind:value="{ingred.quantity}" class="input w-[60px] h-8 text-center" noarrows on:input="{try_save_recipe}" />
+                                    <input bind:value="{ingred.quantity}" class="input w-[60px] h-8 text-center" on:input="{try_save_recipe}" />
                                     <input type="text" bind:value="{ingred.unit}" class="input w-[100px] h-8 text-center" placeholder="Unit" on:input="{try_save_recipe}" />
                                     <input bind:value="{ingred.ingredient}" class="input text-center h-8 ingredient-ingredient-input" on:input="{try_save_recipe}" placeholder="Ingredient Name (bksp to clear)" v-on:keyup.delete="e => check_empty_ingredient(e, ingredIndex)" />
                                     <br />
                                 </div>
-                                <textarea bind:value="{ingred.notes}" class="ingredient-notes-input p-1" placeholder="Notes" rows="1" auto-grow />
+                                <textarea bind:value="{ingred.notes}" class="ingredient-notes-input p-1" placeholder="Notes" rows="1" />
                             </div>
                         {/each}
                         <button class="btn btn-info" on:click="{add_ingredient}">

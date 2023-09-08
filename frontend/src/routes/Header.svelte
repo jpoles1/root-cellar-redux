@@ -11,7 +11,7 @@
     </div>
     <div class="flex space-x-4">   
         {#if !$uaccount}
-            <a class="btn" href="/login">Login</a>
+            <a class="btn btn-sm" href="/login">Login</a>
         {:else}
             <a href="/recipe/edit" class="btn btn-sm">   
                 <Icon icon="typcn:plus" /> Recipe

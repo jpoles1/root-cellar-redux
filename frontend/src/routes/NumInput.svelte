@@ -1,10 +1,10 @@
 <script lang="ts">
     export let placeholder: string;
-    export let value: string;
-    export let disabled: boolean;
-    export let noarrows: boolean;
-    export let nofloatplaceholder: boolean;
-    export let alwaysfloatplaceholder: boolean;
+    export let value: number = 0;
+    export let disabled: boolean = false;
+    export let noarrows: boolean = false;
+    export let nofloatplaceholder: boolean = false;
+    export let alwaysfloatplaceholder: boolean = false;
 
     import { createEventDispatcher } from 'svelte';
     const dispatch = createEventDispatcher();
