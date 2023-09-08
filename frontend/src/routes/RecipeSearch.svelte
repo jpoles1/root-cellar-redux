@@ -57,5 +57,8 @@
                 </div>
             </div>
         {/each}
+        {#if recipes.length == 0} 
+            <h1>Sorry, no recipes found...</h1>
+        {/if}
     </div>
 </div>
