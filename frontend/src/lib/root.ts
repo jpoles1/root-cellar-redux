@@ -35,10 +35,11 @@ export class Recipe {
 	total_time?: number = 0
 	tags: string[] = []
 	og_id = ""
-    od_url = ""
+    og_url = ""
 	archived = false
     created: number = Date.now()
     last_updated: number = Date.now()
+    pics?: any[]
 
     constructor(data?: Partial<Recipe>) {
         Object.assign(this, data);
@@ -54,7 +55,7 @@ export class Recipe {
     txt_to_ingredients(txt: string): Ingredient[] {
         const ingredient_stringList = txt
             .split("\n")
-            .map(x => x.trim())
+            .map(x => x.trim().replaceAll("of ", ""))
             .filter(x => x.length > 0);
         const ingredient_list = ingredient_stringList.map(x => iparser.parse(x) as Ingredient);
         return ingredient_list;

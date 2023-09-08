@@ -7,9 +7,10 @@
     import { onMount } from 'svelte';
 	import { toast } from '@zerodevx/svelte-toast'
 	import AutoTextArea from "@/AutoTextArea.svelte";
+	import RecipeToolbar from "@/RecipeToolbar.svelte";
 
     export let data;
-    let routeid = data.routeid;
+    let recipeid = data.recipeid;
     let recipe: Recipe = new Recipe()
 
     let show_raw_ingredients = false;
@@ -61,28 +62,38 @@
             recipe = await pb.collection("recipes").update(recipe.id, recipe) as Recipe
         } else {
             recipe = await pb.collection("recipes").create(recipe)
-            const url = new URL(window.location.origin.toString() + "/edit/" + recipe.id)
+            const url = new URL(window.location.origin.toString() + `/recipe/${recipe.id}/edit`)
             history.pushState({}, '', url);
         }
         toast.push("Saved Recipe!", {classes: ["success"]})
     }
-    let save_debounce = debounce(save_recipe, 250, 5000)
+    let save_debounce = debounce(save_recipe, 2000, 0)
     const try_save_recipe = () => {
         save_debounce()
         console.log("SAVEW")
     }
     const rearrange_instruction = (i, e) => {
-        console.log(i, e)
+        let newi = parseInt(e.target.value)
+        if (isNaN(newi)) return;
+        newi--;
+        if (recipe === undefined) return;
+        // Blur input
+        e.target.blur();
+        // Rearranges instruction array
+        recipe.instructions.splice(newi, 0, recipe.instructions.splice(i, 1)[0]);
+        recipe = JSON.parse(JSON.stringify(recipe))
+        // Save updates
+        try_save_recipe();
     }
 
     onMount(async () => {
-        console.log(routeid)
-        if (routeid == undefined || routeid == "") {
+        console.log(recipeid)
+        if (recipeid == undefined || recipeid == "") {
             recipe = new Recipe()
             add_ingredient()
             add_instruction()
         } else {
-            recipe = new Recipe(await pb.collection("recipes").getOne(routeid))
+            recipe = new Recipe(await pb.collection("recipes").getOne(recipeid))
             console.log(recipe)
         }
         raw_ingredients = regen_raw_ingredients()
@@ -93,16 +104,18 @@
 <div> 
     {#if recipe}
         <div class="flex justify-center mb-10">
-            <input type="text" placeholder="Recipe Name" bind:value="{recipe.title}" class="input m-auto w-[800px] max-w-[96%] text-[28pt] text-center p-8" />
+            <input type="text" placeholder="Recipe Name" bind:value="{recipe.title}" class="input m-auto w-[800px] max-w-[96%] text-[28pt] text-center p-8" on:input="{try_save_recipe}"/>
         </div>
         <div class="flex justify-center space-x-8 mb-5">
-            <NumInput placeholder="# of Servings" bind:value="{recipe.servings}" on:input="{try_save_recipe}" />
-            <NumInput placeholder="Active Time" bind:value="{recipe.active_time}" on:input="{try_save_recipe}" />
-            <NumInput placeholder="Total Time" bind:value="{recipe.total_time}" on:input="{try_save_recipe}" />
+            <NumInput placeholder="# of Servings" bind:value="{recipe.servings}" on:input="{try_save_recipe}" class="w-24" noarrows alwaysfloatplaceholder />
+            <NumInput placeholder="Active Time" bind:value="{recipe.active_time}" on:input="{try_save_recipe}" class="w-24" noarrows alwaysfloatplaceholder />
+            <NumInput placeholder="Total Time" bind:value="{recipe.total_time}" on:input="{try_save_recipe}" class="w-24" noarrows alwaysfloatplaceholder />
         </div>
         <div class="flex justify-center mb-10">
-            <TextInput placeholder="Original Recipe URL" bind:value="{recipe.og_url}" class="w-[500px]" on:input="{try_save_recipe}" />
+            <TextInput placeholder="Original Recipe URL" bind:value="{recipe.og_url}" class="w-[500px] input-xs" on:input="{try_save_recipe}" />
         </div>
+        <hr>
+            <RecipeToolbar recipe="{recipe}" editing/>
         <hr>
         <div>
             <div class="flex justify-around flex-wrap">
@@ -116,9 +129,9 @@
                         {#each recipe.ingredients as ingred, i}
                             <div class="mb-4">
                                 <div class="flex justify-center">
-                                    <input bind:value="{ingred.quantity}" class="input w-[60px] h-8 text-center" noarrows />
-                                    <input type="text" bind:value="{ingred.unit}" class="input w-[100px] h-8 text-center" placeholder="Unit" />
-                                    <input bind:value="{ingred.ingredient}" class="input text-center h-8 ingredient-ingredient-input" placeholder="Ingredient Name (bksp to clear)" v-on:keyup.delete="e => check_empty_ingredient(e, ingredIndex)" />
+                                    <input bind:value="{ingred.quantity}" class="input w-[60px] h-8 text-center" noarrows on:input="{try_save_recipe}" />
+                                    <input type="text" bind:value="{ingred.unit}" class="input w-[100px] h-8 text-center" placeholder="Unit" on:input="{try_save_recipe}" />
+                                    <input bind:value="{ingred.ingredient}" class="input text-center h-8 ingredient-ingredient-input" on:input="{try_save_recipe}" placeholder="Ingredient Name (bksp to clear)" v-on:keyup.delete="e => check_empty_ingredient(e, ingredIndex)" />
                                     <br />
                                 </div>
                                 <textarea bind:value="{ingred.notes}" class="ingredient-notes-input p-1" placeholder="Notes" rows="1" auto-grow />
@@ -140,7 +153,7 @@
                             <div>
                                 <div class="instruction-order h-[40px]">
                                     <b>#</b>
-                                    <input type="number" min="1" value="{i + 1}" class="instruction-order-input bg-base-200" on:input="{(e) => rearrange_instructions(i, e)}" />
+                                    <input type="number" min="1" value="{i + 1}" class="instruction-order-input bg-base-200" on:input="{(e) => rearrange_instruction(i, e)}" />
                                 </div>
                                 <div class="instruction-order mr-2 h-[40px]">
                                     <!--Opt: <input type="checkbox" class="checkbox"/>-->

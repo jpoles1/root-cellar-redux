@@ -13,15 +13,9 @@
         {#if !$uaccount}
             <a class="btn" href="/login">Login</a>
         {:else}
-            {#if $uaccount.oai_key && $uaccount.oai_key.length > 0 }
-                <a href="/addcoins" class="btn">   
-                    OpenAI <Icon icon="zondicons:key" class="text-yellow-300"/>
-                </a>
-            {:else}
-                <a href="/addcoins" class="btn {$uaccount.coins == 0 ? "animate-outofcash" : ($uaccount.coins < 10 ? "animate-lowcash" : "") }">   
-                    {$uaccount.coins} <Icon icon="akar-icons:coin" class="text-yellow-300"/>
-                </a>
-            {/if}
+            <a href="/recipe/edit" class="btn">   
+                <Icon icon="typcn:plus" /> Recipe
+            </a>
             <a class="btn" href="/logout">Logout</a>
         {/if}
     </div>

@@ -105,7 +105,7 @@ export function prettyPrintingPress(ingredient: Ingredient): string {
 			quantity += quantity ? " " + fractional : fractional;
 		}
 		if (((+whole !== 0 && typeof remainder !== "undefined") || +whole > 1) && unit) {
-			//unit = nounInflector.pluralize(unit);
+			unit = nounInflector.pluralize(unit);
 		}
 	} else {
 		return ingredient.ingredient;
