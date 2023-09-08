@@ -7,7 +7,6 @@
 	import { redirect } from '@sveltejs/kit';
 
   if (pb.authStore.isValid) {
-    console.log(pb.authStore);
     redirect(303, "/");
   }
 

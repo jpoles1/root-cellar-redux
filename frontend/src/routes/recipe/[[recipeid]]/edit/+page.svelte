@@ -13,7 +13,7 @@
 
     export let data;
     let recipeid = data.recipeid;
-    let recipe: Recipe = new Recipe()
+    let recipe: Recipe;
 
     let show_raw_ingredients = false;
     let raw_ingredients = "";
@@ -30,7 +30,6 @@
         show_raw_ingredients = !show_raw_ingredients
     }
     const regen_raw_ingredients = (): string => {
-        console.log(recipe)
         return recipe.ingredients_to_txt()
     }
 
@@ -43,7 +42,6 @@
         show_raw_instructions = !show_raw_instructions
     }
     const regen_raw_instructions = (): string => {
-        console.log(recipe)
         return recipe.instructions_to_txt()
     }
 
@@ -60,7 +58,6 @@
         if (show_raw_instructions) recipe.instructions = recipe.txt_to_instructions(raw_instructions)
 
         recipe.uid = $uaccount.id
-        console.log(recipe)
         if (!pb.authStore.model || !pb.authStore.model.id) {
             throw Error("Unable to update api key, login error.")
         }
@@ -76,7 +73,6 @@
     let save_debounce = debounce(save_recipe, 15000, 0)
     const try_save_recipe = () => {
         save_debounce()
-        console.log("SAVEW")
     }
 
     let pic_files: any;
@@ -139,7 +135,6 @@
     }
 
     onMount(async () => {
-        console.log(recipeid)
         if (recipeid == undefined || recipeid == "") {
             recipe = new Recipe()
             add_ingredient()
@@ -260,7 +255,12 @@
             </div>
         </div>
     {:else}
-
+        <div class="flex justify-center">
+            <div class="flex justify-center flex-col text-center">
+                <h1 class="h1 my-5">Loading Recipe...</h1>
+                <progress class="progress w-56"></progress>
+            </div>
+        </div>
     {/if}
 </div>
 

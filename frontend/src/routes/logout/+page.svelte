@@ -3,7 +3,6 @@
 	import { redirect } from '@sveltejs/kit';
     import {goto} from "$app/navigation"
     if (pb.authStore.isValid) {
-        console.log(pb.authStore);
         pb.authStore.clear();
         goto("/login")
     }

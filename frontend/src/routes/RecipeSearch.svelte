@@ -1,21 +1,3 @@
-<!--
-<div style="display: flex; justify-content: center; flex-wrap: wrap;">
-    <headful title="Root Cellar - Recipe List" />
-    <v-card v-for="(recipe, recipeIndex) in recipeList" :key="recipeIndex" class="recipe-list-card">
-        <div>
-            <h3 @click="$router.push(`/recipe/${recipe.id}/`)" style="cursor: pointer">{{ recipe.name }}</h3>
-            <div v-if="recipe.servings != ''">Servings: {{ recipe.servings }}</div>
-            <div v-if="recipe.active_time != ''">Active Time: {{ recipe.active_time }} min</div>
-            <div v-if="recipe.total_time != ''">Total Time: {{ recipe.total_time }} min</div>
-            Created on: {{ when_created(recipe.id) }}
-            <div style="transform: scale(0.8); text-align: center;">
-                <v-btn :href="`/recipe/${recipe.id}/`" class="primary" small fab style="margin: 5px 10px"><i class="fas fa-search" style="font-size: 150%;"/></v-btn>
-                <v-btn :href="`/recipe/${recipe.id}/edit`" class="primary" small fab><i class="fas fa-pencil-alt" style="font-size: 150%;"/></v-btn>
-            </div>
-        </div>
-    </v-card>
-</div>
--->
 <script lang="ts">
 	import { pb, uaccount } from "$lib/pocketbase";
 	import { onMount } from "svelte";
@@ -32,7 +14,6 @@
         let title_search = search_query ? `&& (title ?~ '${search_query}' || ingredients ?~ '${search_query}')` : ''
         let archived_search = 'archived=false'
         recipes = await pb.collection("recipes").getFullList({filter: `${archived_search} ${title_search}`, sort: '-created'})
-        console.log(recipes)
     }
     let search_debounce = debounce(search_recipes, 500, 1000)
     const try_search_recipes = () => {
@@ -50,9 +31,9 @@
         <input type="text" placeholder="Search Recipes..." bind:value="{search_query}" class="input m-auto w-[800px] max-w-[96%] text-[14pt] text-center p-8" on:input="{try_search_recipes}"/>
     </div>
     <hr class="my-5">
-    <div class="flex justify-center space-x-5 space-y-8 w-full flex-wrap">
+    <div class="flex justify-center space-x-5 space-y-5 w-full flex-wrap">
         {#each recipes as recipe}
-            <div class="card w-[300px] bg-base-100">
+            <div class="card overflow-hidden w-[300px] bg-base-100">
                 <a href="/recipe/{recipe.id}/view">
                     <figure class="h-[200px]">
                         <img src="{recipe.pics[0] ? pb.files.getUrl(recipe, recipe.pics[0], {'thumb': '100x200'}) : '/sprout_wide.png'}" alt="Recipe Photo" />

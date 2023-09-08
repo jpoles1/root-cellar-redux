@@ -13,6 +13,10 @@
     const duplicate = async () => {
         if(confirm("Are you sure you want to duplicate this recipe?")) {
             let new_recipe: Recipe = JSON.parse(JSON.stringify(recipe))
+            //Giving credit
+            if (!recipe.og_id) {
+                new_recipe.og_id = recipe.id
+            }
             new_recipe.id = ""
             new_recipe.pics = []
             new_recipe.title = new_recipe.title + " - Copy"

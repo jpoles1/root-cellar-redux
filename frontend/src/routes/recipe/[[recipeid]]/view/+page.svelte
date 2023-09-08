@@ -11,24 +11,21 @@
 
     export let data;
     let recipeid = data.recipeid;
-    let recipe: Recipe = new Recipe()
+    let recipe: Recipe
 
     let ingredients_compelted: Record<number, boolean> = {}
     let instructions_completed: Record<number, boolean> = {}
 
     onMount(async () => {
-        console.log(recipeid)
         if (recipeid == undefined || recipeid == "") {
             recipe = new Recipe()
         } else {
             recipe = new Recipe(await pb.collection("recipes").getOne(recipeid))
-            console.log(recipe)
         }
     });
 </script>
 
 <div> 
-    {JSON.stringify(instructions_completed)}
     {#if recipe}
         <div class="flex justify-center mb-10">
             <div class="m-auto w-[800px] max-w-[96%] text-[28pt] text-center p-8">
@@ -103,7 +100,12 @@
             </div>
         </div>
     {:else}
-
+        <div class="flex justify-center">
+            <div class="flex justify-center flex-col text-center">
+                <h1 class="h1 my-5">Loading Recipe...</h1>
+                <progress class="progress w-56"></progress>
+            </div>
+        </div>
     {/if}
 </div>
 
