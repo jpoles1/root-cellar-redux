@@ -27,6 +27,9 @@ onDestroy(() => {
   instance.cleanUp();
 });
 
+import { createEventDispatcher } from 'svelte';
+const dispatch = createEventDispatcher();
+
 </script>
 
-<textarea {...$$props} bind:this={element} bind:value={value} class="textarea overflow-auto w-full"/>
+<textarea {...$$props} bind:this={element} bind:value={value} class="textarea overflow-auto w-full" on:input="{(e) => dispatch("input", e)}"/>
