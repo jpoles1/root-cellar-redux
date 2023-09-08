@@ -47,9 +47,11 @@
                         {/if}
                     </div>
                     <div class="card-actions justify-end">
-                        <a class="btn btn-primary btn-sm font-bold" href="/recipe/{recipe.id}/edit">
-                            <Icon icon="fa6-solid:pencil" class="font-bold"/>
-                        </a>
+                        {#if $uaccount && $uaccount.id == recipe.uid}
+                            <a class="btn btn-primary btn-sm font-bold" href="/recipe/{recipe.id}/edit">
+                                <Icon icon="fa6-solid:pencil" class="font-bold"/>
+                            </a>
+                        {/if}
                         <a class="btn btn-primary btn-sm font-bold" href="/recipe/{recipe.id}/view">
                             <Icon icon="fa6-solid:magnifying-glass" class="font-bold"/>
                         </a>

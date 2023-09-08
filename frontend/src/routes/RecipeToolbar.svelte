@@ -33,7 +33,7 @@
 </script>
 
 <div class="flex justify-center space-x-4 my-4">
-    {#if recipe}
+    {#if recipe && recipe.id}
         {#if owner && !editing}
             <a class="btn btn-primary btn-sm font-bold" href="/recipe/{recipe.id}/edit">
                 <Icon icon="fa6-solid:pencil" class="font-bold"/> Edit

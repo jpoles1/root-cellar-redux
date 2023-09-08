@@ -15,10 +15,10 @@
     let recipeid = data.recipeid;
     let recipe: Recipe;
 
-    let show_raw_ingredients = false;
+    let show_raw_ingredients = !(recipeid && recipeid != "");
     let raw_ingredients = "";
 
-    let show_raw_instructions = false;
+    let show_raw_instructions = !(recipeid && recipeid != "");
     let raw_instructions = "";
 
     const toggle_raw_ingredients = () => {
@@ -57,6 +57,9 @@
         if (show_raw_ingredients) recipe.ingredients = recipe.txt_to_ingredients(raw_ingredients)
         if (show_raw_instructions) recipe.instructions = recipe.txt_to_instructions(raw_instructions)
 
+        //Don't save empty recipes
+        if (!(recipe.ingredients.length > 0 || recipe.instructions.length > 0)) return
+
         recipe.uid = $uaccount.id
         if (!pb.authStore.model || !pb.authStore.model.id) {
             throw Error("Unable to update api key, login error.")
@@ -70,7 +73,7 @@
         }
         toast.push("Saved Recipe!", {classes: ["success"]})
     }
-    let save_debounce = debounce(save_recipe, 15000, 0)
+    let save_debounce = debounce(save_recipe, recipeid && recipeid != "" ? 5000 : 2000, 0)
     const try_save_recipe = () => {
         save_debounce()
     }

@@ -32,14 +32,15 @@ export class Recipe {
     instructions: Instruction[] = []
     servings?: number = 0
 	active_time?: number = 0
-	total_time?: number = 0
-	tags: string[] = []
-	og_id = ""
-    og_url = ""
+	total_time?: number = 0	
 	archived = false
+    og_id = ""
+    og_url = ""
+    version: number = 1
+    tags: string[] = []
+    pics?: any[]
     created: number = Date.now()
     last_updated: number = Date.now()
-    pics?: any[]
 
     constructor(data?: Partial<Recipe>) {
         Object.assign(this, data);
@@ -47,7 +48,8 @@ export class Recipe {
 
     ingredients_to_txt(): string {
         const raw_ingred = this.ingredients.reduce((agg, ing, i): string => {
-            return agg + `\n${ing.quantity}${ing.unit ? ' ' + ing.unit : ''} of ${ing.ingredient}`
+            const quant_str = ing.quantity ? `${ing.quantity}${ing.unit ? ' ' + ing.unit : ''} of ` : ''
+            return agg + `\n${quant_str}${ing.ingredient}`
         }, "").trim()
 
         return raw_ingred
@@ -63,7 +65,8 @@ export class Recipe {
 
     instructions_to_txt(): string {
         const raw_instruct = this.instructions.reduce((agg, inst, i): string => {
-            return agg + `\n${i+1}) ${inst.instruction}${inst.optional ? ' (Optional)' : ''}`
+            const inst_str = inst.instruction ? `\n${i+1}) ${inst.instruction}${inst.optional ? ' (Optional)' : ''}` : ''
+            return agg + inst_str
         }, "").trim()
         return raw_instruct
     }
