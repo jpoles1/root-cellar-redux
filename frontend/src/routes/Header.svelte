@@ -7,7 +7,7 @@
     <div>
     </div>
     <div class="flex items-center"> 
-        <a href="/"><h1>DocQuery</h1></a>
+        <a href="/"><h1>Root Cellar</h1></a>
     </div>
     <div class="flex space-x-4">   
         {#if !$uaccount}

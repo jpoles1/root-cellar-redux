@@ -29,4 +29,4 @@ onDestroy(() => {
 
 </script>
 
-<textarea {...$$props} bind:this={element} bind:value={value} class="textarea overflow-auto"/>
+<textarea {...$$props} bind:this={element} bind:value={value} class="textarea overflow-auto w-full"/>

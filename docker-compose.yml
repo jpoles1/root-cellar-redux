@@ -2,6 +2,7 @@ version: "3"
 
 services:
   pb:
+    container_name: root-cellar-pb
     build: pb
     ports:
       - 8090:8090

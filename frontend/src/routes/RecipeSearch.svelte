@@ -16,9 +16,22 @@
     </v-card>
 </div>
 -->
+<script lang="ts">
+	import { pb } from "$lib/pocketbase";
+	import { onMount } from "svelte";
+
+    let recipes = []
+
+    onMount(() => {
+        recipes = pb.collection("recipes").getFullList()
+    })
+</script>
+
 <div>
     <h2>Root Recipes</h2>
     <div>
-        
+        {#each recipes as recipe}
+            {JSON.stringify(recipe)}
+        {/each}
     </div>
 </div>
