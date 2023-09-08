@@ -17,11 +17,12 @@
 </div>
 -->
 <script lang="ts">
-	import { pb } from "$lib/pocketbase";
+	import { pb, uaccount } from "$lib/pocketbase";
 	import { onMount } from "svelte";
 	import TextInput from "./TextInput.svelte";
 	import { debounce } from "$lib/debounce";
 	import Icon from "@iconify/svelte";
+	import { goto } from "$app/navigation";
 
     let recipes = []
     let search_my_recipes = false;
@@ -30,7 +31,7 @@
     const search_recipes = async () => {
         let title_search = search_query ? `&& (title ?~ '${search_query}' || ingredients ?~ '${search_query}')` : ''
         let archived_search = 'archived=false'
-        recipes = await pb.collection("recipes").getFullList({filter: `${archived_search} ${title_search}`})
+        recipes = await pb.collection("recipes").getFullList({filter: `${archived_search} ${title_search}`, sort: '-created'})
         console.log(recipes)
     }
     let search_debounce = debounce(search_recipes, 500, 1000)
@@ -39,17 +40,17 @@
     }
 
     onMount(async () => {
+        if(!$uaccount) goto("/login");
         search_recipes()
     })
 </script>
 
 <div>
-    <h1>Root Recipes</h1>
     <div class="flex justify-center">
         <input type="text" placeholder="Search Recipes..." bind:value="{search_query}" class="input m-auto w-[800px] max-w-[96%] text-[14pt] text-center p-8" on:input="{try_search_recipes}"/>
     </div>
     <hr class="my-5">
-    <div class="flex justify-center space-x-5 w-full">
+    <div class="flex justify-center space-x-5 space-y-8 w-full flex-wrap">
         {#each recipes as recipe}
             <div class="card w-[300px] bg-base-100">
                 <a href="/recipe/{recipe.id}/view">

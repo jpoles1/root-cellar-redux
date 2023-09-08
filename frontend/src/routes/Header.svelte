@@ -3,20 +3,20 @@
 	import Icon from '@iconify/svelte';
 </script>
 
-<div class="bg-base-300 min-h-6 p-2 flex justify-between align-middle">
+<div class="bg-base-300 p-2 flex justify-between align-middle">
     <div>
     </div>
     <div class="flex items-center"> 
-        <a href="/"><h1>Root Cellar</h1></a>
+        <a href="/" data-sveltekit-reload><h1>Root Cellar</h1></a>
     </div>
     <div class="flex space-x-4">   
         {#if !$uaccount}
             <a class="btn" href="/login">Login</a>
         {:else}
-            <a href="/recipe/edit" class="btn">   
+            <a href="/recipe/edit" class="btn btn-sm">   
                 <Icon icon="typcn:plus" /> Recipe
             </a>
-            <a class="btn" href="/logout">Logout</a>
+            <a class="btn btn-sm" href="/logout">Logout</a>
         {/if}
     </div>
 </div>

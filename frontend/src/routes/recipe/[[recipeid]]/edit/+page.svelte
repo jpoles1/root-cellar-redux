@@ -4,10 +4,12 @@
     import {Recipe, Ingredient, Instruction} from "$lib/root"
     import {debounce} from "$lib/debounce"
 	import { pb, uaccount } from "$lib/pocketbase";
-    import { onMount } from 'svelte';
+    import { onDestroy, onMount } from 'svelte';
 	import { toast } from '@zerodevx/svelte-toast'
 	import AutoTextArea from "@/AutoTextArea.svelte";
 	import RecipeToolbar from "@/RecipeToolbar.svelte";
+	import Icon from "@iconify/svelte";
+	import { goto } from "$app/navigation";
 
     export let data;
     let recipeid = data.recipeid;
@@ -53,15 +55,19 @@
         recipe.instructions = [...recipe.instructions, new Instruction()]
     }
     const save_recipe = async () => {
-        recipe.uid = pb.authStore.model.id
+        if(!$uaccount) return
+        if (show_raw_ingredients) recipe.ingredients = recipe.txt_to_ingredients(raw_ingredients)
+        if (show_raw_instructions) recipe.instructions = recipe.txt_to_instructions(raw_instructions)
+
+        recipe.uid = $uaccount.id
         console.log(recipe)
         if (!pb.authStore.model || !pb.authStore.model.id) {
             throw Error("Unable to update api key, login error.")
         }
         if (recipe.id != "") {
-            recipe = await pb.collection("recipes").update(recipe.id, recipe) as Recipe
+            recipe = new Recipe(await pb.collection("recipes").update(recipe.id, recipe))
         } else {
-            recipe = await pb.collection("recipes").create(recipe)
+            recipe = new Recipe(await pb.collection("recipes").create(recipe))
             const url = new URL(window.location.origin.toString() + `/recipe/${recipe.id}/edit`)
             history.pushState({}, '', url);
         }
@@ -72,7 +78,22 @@
         save_debounce()
         console.log("SAVEW")
     }
-    const rearrange_instruction = (i, e) => {
+
+    let pic_files: any;
+    const upload_pic = async () => {
+        const recipe_form = new FormData()
+        recipe_form.append('pics', pic_files[0]);
+
+
+        // upload and create new record
+        recipe = new Recipe(await pb.collection("recipes").update(recipe.id, recipe_form))
+    }
+
+    const delete_pic = async (pic: any) => {
+        recipe = new Recipe(await pb.collection("recipes").update(recipe.id, {'pics-': [pic]}))
+    }
+
+    const rearrange_instructions = (i, e) => {
         let newi = parseInt(e.target.value)
         if (isNaN(newi)) return;
         newi--;
@@ -81,7 +102,20 @@
         e.target.blur();
         // Rearranges instruction array
         recipe.instructions.splice(newi, 0, recipe.instructions.splice(i, 1)[0]);
-        recipe = JSON.parse(JSON.stringify(recipe))
+        recipe.instructions = [...recipe.instructions]
+        // Save updates
+        try_save_recipe();
+    }
+    const rearrange_pics = (i, e) => {
+        let newi = parseInt(e.target.value)
+        if (isNaN(newi) || !recipe.pics) return;
+        newi--;
+        if (recipe === undefined) return;
+        // Blur input
+        e.target.blur();
+        // Rearranges instruction array
+        recipe.pics.splice(newi, 0, recipe.pics.splice(i, 1)[0]);
+        recipe.pics = [...recipe.pics]
         // Save updates
         try_save_recipe();
     }
@@ -94,11 +128,15 @@
             add_instruction()
         } else {
             recipe = new Recipe(await pb.collection("recipes").getOne(recipeid))
-            console.log(recipe)
+            if (recipe.uid != $uaccount.id) goto("/")
         }
         raw_ingredients = regen_raw_ingredients()
         raw_instructions = regen_raw_instructions()
     });
+
+    onDestroy(() => {
+        save_recipe()
+    })
 </script>
 
 <div> 
@@ -115,7 +153,31 @@
             <TextInput placeholder="Original Recipe URL" bind:value="{recipe.og_url}" class="w-[500px] input-xs" on:input="{try_save_recipe}" />
         </div>
         <hr>
-            <RecipeToolbar recipe="{recipe}" editing/>
+        {#if recipe.pics && recipe.pics.length > 0}
+            <div class="flex justify-center my-10 space-x-4">
+                    {#each recipe.pics as pic, i (pic)}
+                        <figure class="h-[250px] relative">
+                            <div class="absolute top-0 right-0 p-2 bg-base-200 border border-base-300 rounded-bl-xl rounded-tr-xl">
+                                #<input type="number" min="1" value="{i + 1}" class="instruction-order-input bg-base-200" on:input="{(e) => rearrange_pics(i, e)}" />
+                            </div>
+                            <div class="absolute -bottom-0.5 right-0 p-2 bg-error rounded-tl-xl rounded-br-xl">
+                                <button on:click="{() => delete_pic(pic)}"><Icon icon="tabler:trash"/></button>
+                            </div>
+                            <img src="{pb.files.getUrl(recipe, pic, {'thumb': '250x250'})}" alt="Recipe Photo" class="rounded-xl border border-base-3 shadow"/>
+                        </figure>
+                    {/each}
+            </div>
+        {/if}
+        <div class="flex justify-center m-5">
+            <div class="form-control w-full max-w-xs">
+                <label class="label">
+                  <span class="label-text">Add a photo:</span>
+                </label>
+                <input type="file" class="file-input-sm file-input file-input-bordered w-full max-w-xs" accept="image/png, image/jpeg;capture=camera" bind:files="{pic_files}" on:change="{upload_pic}"/>
+            </div>
+        </div>
+        <hr>
+        <RecipeToolbar recipe="{recipe}" editing/>
         <hr>
         <div>
             <div class="flex justify-around flex-wrap">
@@ -124,7 +186,7 @@
                     <button class="italic text-blue-500 underline" on:click="{toggle_raw_ingredients}">Show {show_raw_ingredients ? "WYSIWG" : "Raw"}</button>
                     <hr class="my-5">
                     {#if show_raw_ingredients}
-                        <AutoTextArea bind:value="{raw_ingredients}" class="ingredient-notes-input w-full"/>
+                        <AutoTextArea bind:value="{raw_ingredients}" class="ingredient-notes-input w-full" on:input="{try_save_recipe}"/>
                     {:else}
                         {#each recipe.ingredients as ingred, i}
                             <div class="mb-4">
@@ -147,13 +209,13 @@
                     <button class="italic text-blue-500 underline" on:click="{toggle_raw_instructions}">Show {show_raw_instructions ? "WYSIWG" : "Raw"}</button>
                     <hr class="my-5">
                     {#if show_raw_instructions}
-                        <AutoTextArea bind:value="{raw_instructions}" class="ingredient-notes-input w-full"/>
+                        <AutoTextArea bind:value="{raw_instructions}" class="ingredient-notes-input w-full" on:input="{try_save_recipe}"/>
                     {:else}
-                        {#each recipe.instructions as instruct, i}
+                        {#each recipe.instructions as instruct, i (instruct)}
                             <div>
                                 <div class="instruction-order h-[40px]">
                                     <b>#</b>
-                                    <input type="number" min="1" value="{i + 1}" class="instruction-order-input bg-base-200" on:input="{(e) => rearrange_instruction(i, e)}" />
+                                    <input type="number" min="1" value="{i + 1}" class="instruction-order-input bg-base-200" on:input="{(e) => rearrange_instructions(i, e)}" />
                                 </div>
                                 <div class="instruction-order mr-2 h-[40px]">
                                     <!--Opt: <input type="checkbox" class="checkbox"/>-->

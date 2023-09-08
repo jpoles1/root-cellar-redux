@@ -45,6 +45,18 @@
                 <a href="{recipe.og_url}" target="_blank" class="link text-lg w-[500px]">Original Recipe</a>
             </div>
         {/if}
+        {#if recipe.pics && recipe.pics.length > 0}
+            <hr>
+            <div class="flex justify-center my-10 space-x-4">
+                {#if recipe.pics}
+                    {#each recipe.pics as pic, i (pic)}
+                        <figure class="h-[250px] relative">
+                            <img src="{pb.files.getUrl(recipe, pic, {'thumb': '250x250'})}" alt="Recipe Photo" class="rounded-xl border border-base-3 shadow"/>
+                        </figure>
+                    {/each}
+                {/if}
+            </div>
+        {/if}
         <hr>
         <RecipeToolbar recipe="{recipe}" viewing/>
         <hr>
