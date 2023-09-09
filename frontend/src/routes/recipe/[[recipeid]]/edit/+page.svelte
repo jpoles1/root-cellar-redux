@@ -11,15 +11,17 @@
     import Gallery from "$lib/gallery/Gallery.svelte";
 	import Icon from "@iconify/svelte";
 	import { goto } from "$app/navigation";
+	import { page } from "$app/stores";
 
     export let data;
     let recipeid = data.recipeid;
     let recipe: Recipe;
 
-    let show_raw_ingredients = !(recipeid && recipeid != "");
+    let raweditor: boolean = $page.url.searchParams.get("raweditor")
+    let show_raw_ingredients = true //!(recipeid && recipeid != "") || raweditor;
     let raw_ingredients = "";
 
-    let show_raw_instructions = !(recipeid && recipeid != "");
+    let show_raw_instructions = !(recipeid && recipeid != "") || raweditor;
     let raw_instructions = "";
 
     const toggle_raw_ingredients = () => {
@@ -55,8 +57,8 @@
     }
     const save_recipe = async () => {
         if(!$uaccount) return
-        if (show_raw_ingredients) recipe.ingredients = recipe.txt_to_ingredients(raw_ingredients)
-        if (show_raw_instructions) recipe.instructions = recipe.txt_to_instructions(raw_instructions)
+        if (show_raw_ingredients) recipe.ingredients = txt_to_ingredients(raw_ingredients)
+        if (show_raw_instructions) recipe.instructions = txt_to_instructions(raw_instructions)
 
         //Don't save empty recipes
         if (!(recipe.ingredients.length > 0 || recipe.instructions.length > 0)) return
@@ -79,6 +81,7 @@
         save_debounce()
     }
 
+    let show_photo_editor = true;
     let pic_files: any;
     const upload_pic = async () => {
         const recipe_form = new FormData()
@@ -88,9 +91,17 @@
         // upload and create new record
         recipe = new Recipe(await pb.collection("recipes").update(recipe.id, recipe_form))
     }
-
-    const delete_pic = async (pic: any) => {
-        recipe = new Recipe(await pb.collection("recipes").update(recipe.id, {'pics-': [pic]}))
+    let add_pic_url = "";
+    const add_pic_by_url = () => {
+        const valid_img_url_regex = /^https?:\/\/\S+\.((jpg|jpeg|png|gif|bmp|svg|webp|tiff|ico)(\?.*)?)$/i
+        if (add_pic_url.match(valid_img_url_regex)) {
+            recipe.pic_urls = [...recipe.pic_urls, add_pic_url]
+            add_pic_url = ""
+            try_save_recipe()
+        } else {
+            toast.push("Failed to add image, invalid URL")
+        }
+        
     }
 
     const rearrange_instructions = (i: number, e: Event) => {
@@ -136,6 +147,7 @@
         }
         raw_ingredients = regen_raw_ingredients()
         raw_instructions = regen_raw_instructions()
+        show_photo_editor = !(recipe.pics.length + recipe.pic_urls.length > 0)
     });
 
     onDestroy(() => {
@@ -159,14 +171,35 @@
             <TextInput placeholder="Original Recipe URL" bind:value="{recipe.og_url}" class="w-[500px] input-xs" on:input="{try_save_recipe}" />
         </div>
         <hr>
-        <Gallery recipe="{recipe}" editable="{true}"/>
-        <div class="flex justify-center m-5">
-            <div class="form-control w-full max-w-xs">
-                <label class="label">
-                  <span class="label-text">Add a photo:</span>
-                </label>
-                <input type="file" class="file-input-sm file-input file-input-bordered w-full max-w-xs" accept="image/png, image/jpeg;capture=camera" bind:files="{pic_files}" on:change="{upload_pic}"/>
+        <div class="card shadow p-2">
+            <div class="text-xl text-center font-medium cursor-pointer {show_photo_editor ? 'border-b border-b-base-300 pb-2' : ''}" on:click="{() => show_photo_editor = !show_photo_editor}">
+                Photo Editor
+                <div class="float-right">
+                    {show_photo_editor ? '-' :  '+'}
+                </div>
             </div>
+            <div class="{show_photo_editor ? 'max-h-[1000px]' : 'max-h-[0px]'} overflow-hidden" style="transition: max-height 0.2s;">
+                <Gallery recipe="{recipe}" editable="{true}" on:save="{try_save_recipe}"/>
+                <div class="flex justify-center flex-wrap">
+                    <div class="flex justify-center m-5">
+                        <div class="form-control w-full max-w-xs">
+                            <label class="label">
+                            <span class="label-text">Add a photo:</span>
+                            </label>
+                            <input type="file" class="file-input-sm file-input file-input-bordered w-full max-w-xs" accept="image/png, image/jpeg;capture=camera" bind:files="{pic_files}" on:change="{upload_pic}"/>
+                        </div>
+                    </div>
+                    <div class="flex justify-center mb-5">
+                        <div class="form-control w-full max-w-xs">
+                            <label class="label">
+                            <span class="label-text">Add photo by URL:</span>
+                            </label>
+                            <input type="text" class="file-input file-input-sm bordered" bind:value="{add_pic_url}" /> 
+                            <button class="btn btn-xs btn-info" on:click="{add_pic_by_url}">Add URL</button>
+                        </div>
+                    </div>
+                </div>
+            </div>  
         </div>
         <hr>
         <RecipeToolbar recipe="{recipe}" editing/>
@@ -179,6 +212,9 @@
                     <hr class="my-5">
                     {#if show_raw_ingredients}
                         <AutoTextArea bind:value="{raw_ingredients}" on:input="{try_save_recipe}"/>
+                        <div class="italic my-2 text-sm">
+                            Note: Please separate each ingredient by a new line
+                        </div>
                     {:else}
                         {#each recipe.ingredients as ingred, i}
                             <div class="mb-4">
@@ -206,6 +242,9 @@
                     <hr class="my-5">
                     {#if show_raw_instructions}
                         <AutoTextArea bind:value="{raw_instructions}" class="ingredient-notes-input w-full" on:input="{try_save_recipe}"/>
+                        <div class="italic my-2 text-sm">
+                            Note: Please separate each instruction by a new line
+                        </div>
                     {:else}
                         {#each recipe.instructions as instruct, i (instruct)}
                             <div>

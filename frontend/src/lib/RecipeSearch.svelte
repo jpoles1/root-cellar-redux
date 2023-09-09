@@ -10,7 +10,7 @@
     let search_query = "";
 
     const search_recipes = async () => {
-        let title_search = search_query ? `&& (title ?~ '${search_query}' || ingredients ?~ '${search_query}')` : ''
+        let title_search = search_query ? `&& (title ?~ '${search_query}' || ingredients ?~ '${search_query}') || tags ?~ '${search_query}')` : ''
         let archived_search = 'archived=false'
         recipes = await pb.collection("recipes").getFullList({filter: `${archived_search} ${title_search}`, sort: '-created'})
     }
@@ -35,7 +35,7 @@
             <div class="card overflow-hidden w-[300px] bg-base-100">
                 <a href="/recipe/{recipe.id}/view">
                     <figure class="h-[200px]">
-                        <img src="{recipe.pics[0] ? pb.files.getUrl(recipe, recipe.pics[0], {'thumb': '100x200'}) : '/sprout_wide.png'}" alt="Recipe Photo" />
+                        <img src="{recipe.pics[0] ? pb.files.getUrl(recipe, recipe.pics[0], {'thumb': '100x200'}) : (recipe.pic_urls ? recipe.pic_urls[0] : '/sprout_wide.png') || '/sprout_wide.png'}" alt="Recipe Photo" />
                     </figure>
                 </a>
                 <div class="card-body">

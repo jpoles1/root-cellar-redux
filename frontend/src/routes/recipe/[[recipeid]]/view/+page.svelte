@@ -43,12 +43,9 @@
                 <a href="{recipe.og_url}" target="_blank" class="link text-lg w-[500px]">Original Recipe</a>
             </div>
         {/if}
-        {#if recipe.pics && recipe.pics.length > 0}
-            <hr>
-            <div class="flex justify-center my-10 space-x-4">
-                <Gallery bind:recipe="{recipe}" editable="{false}"/>
-            </div>
-        {/if}
+        <div class="flex justify-center my-10 space-x-4">
+            <Gallery bind:recipe="{recipe}" editable="{false}"/>
+        </div>
         <hr>
         <RecipeToolbar recipe="{recipe}" viewing/>
         <hr>

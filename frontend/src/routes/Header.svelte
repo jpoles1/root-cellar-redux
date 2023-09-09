@@ -11,15 +11,19 @@
             </label>
             <ul tabindex="0" class="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52">
                 {#if !$uaccount}
-                    <a class="btn btn-sm" href="/login">Login</a>
+                    <a class="btn btn-sm" href="/login" data-sveltekit-reload>
+                        Login
+                    </a>
                 {:else}
-                    <a href="/recipe/edit" class="btn btn-sm">   
+                    <a href="/recipe/edit" class="btn btn-sm" data-sveltekit-reload>   
                         <Icon icon="typcn:plus" /> Recipe
                     </a>
-                    <a href="/recipe/webimport" class="btn btn-sm">   
+                    <a href="/recipe/webimport" class="btn btn-sm" data-sveltekit-reload>   
                         <Icon icon="typcn:camera" /> Import
                     </a>
-                    <a class="btn btn-sm" href="/logout">Logout</a>
+                    <a class="btn btn-sm" href="/logout" data-sveltekit-reload>
+                        Logout
+                    </a>
                 {/if}
             </ul>
         </div>
@@ -35,7 +39,7 @@
         {#if !$uaccount}
             <a class="btn btn-sm" href="/login">Login</a>
         {:else}
-            <a href="/recipe/edit" class="btn btn-sm">   
+            <a href="/recipe/edit" class="btn btn-sm" data-sveltekit-reload>   
                 <Icon icon="typcn:plus" /> Recipe
             </a>
             <a href="/recipe/webimport" class="btn btn-sm">   

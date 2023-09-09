@@ -24,21 +24,22 @@ export class Instruction {
 }
 
 export const txt_to_ingredients = (txt: string): Ingredient[] => {
-    const ingredient_stringList = txt
+    const ingredient_list = txt
         .split("\n")
         .map(x => x.trim().replaceAll("of ", ""))
-        .filter(x => x.length > 0);
-    const ingredient_list = ingredient_stringList.map(x => iparser.parse(x) as Ingredient);
+        .filter(x => x.length > 0)
+        .map((x) => x.replace(/, (.*)$/, "($1)")) // Takes words after commas at end of ingredient and puts them into parenthesis to turn them into notes
+        .map(x => iparser.parse(x) as Ingredient)
     return ingredient_list;
 }
 
 export const txt_to_instructions = (txt: string): Instruction[] => {
     const instruction_list = txt
-        .split("\n")
+        .split(/(?:[\n\t\r]| {3,})+/)
         .map(x => x.trim())
         .filter(x => x.length > 0)
         .map(
-            instruction => {
+            (instruction) => {
                 let optional = false
                 instruction = instruction.replace(/^\d[).]\w*/, "")
                 if (instruction.match(/\(Optional\)/g)) {
@@ -69,9 +70,10 @@ export class Recipe {
 	archived = false
     og_id = ""
     og_url = ""
-    version: number = 1
+    version = 1
     tags: string[] = []
-    pics?: any[]
+    pics?: any
+    pic_urls: string[] = []
     created: number = Date.now()
     last_updated: number = Date.now()
 
@@ -80,9 +82,10 @@ export class Recipe {
     }
 
     ingredients_to_txt(): string {
-        const raw_ingred = this.ingredients.reduce((agg, ing, i): string => {
+        const raw_ingred = this.ingredients.reduce((agg, ing): string => {
             const quant_str = ing.quantity ? `${ing.quantity}${ing.unit ? ' ' + ing.unit : ''} of ` : ''
-            return agg + `\n${quant_str}${ing.ingredient}`
+            const note_str = ing.notes ? ` (${ing.notes})` : ''
+            return agg + `\n${quant_str}${ing.ingredient}${note_str}`
         }, "").trim()
 
         return raw_ingred
@@ -97,29 +100,45 @@ export class Recipe {
 }
 
 export const recipe_from_google_recipe = (google_recipe: GoogleRecipeSchema): Recipe => {
+    console.log(`@type = ${google_recipe["@type"]}`)
+    if (google_recipe["@type"] != "Recipe") {
+        if (google_recipe["@graph"]) {
+            const graph_search = google_recipe["@graph"].filter((x) => x["@type"] == "Recipe")
+            if(graph_search[0]) {
+                google_recipe = graph_search[0]
+            }
+        }
+    }
     const extract_img_url = () => {
         const img: any = google_recipe.image
         console.log(img)
         if (img.url) return img.url
         if (typeof img === "string") return [img]
         if (typeof img[0] === "string") return img
-        if (typeof img[0] === "object") return img.map((x) => x.url)
+        if (typeof img[0] === "object") return img.map((x: any) => x.url)
         return []
+    }
+    const extract_ingredients = () => {
+        const raw_ingred = google_recipe.recipeIngredient
+        const ingredients = Array.isArray(raw_ingred) ? raw_ingred.join('\n') : typeof raw_ingred === 'string' ? raw_ingred : '';
+        return ingredients
+    }
+    const extract_instructions = () => {
+        const raw_instruct = google_recipe.recipeInstructions
+        const instructions = Array.isArray(raw_instruct) ? raw_instruct.map((instruction: any) => instruction.text || "").join('\n') : typeof raw_instruct === 'string' ? raw_instruct : '';
+        return instructions
     }
     return new Recipe({
         title: google_recipe.name || "Unnamed Recipe",
         description: google_recipe.description || "",
-        ingredients: txt_to_ingredients(google_recipe.recipeIngredient.join("\n")),
-        instructions: txt_to_instructions((google_recipe.recipeInstructions.map((instruction: any) => {
-            return instruction.text || ""
-        }) || []).join("\n")),
+        ingredients: txt_to_ingredients(extract_ingredients()),
+        instructions: txt_to_instructions(extract_instructions()),
         servings: parseInt(google_recipe.recipeYield) || 0,
         //active_time: google_recipe.cookTime || 0,
         //total_time: google_recipe.totalTime || 0,
         archived: false,
-        og_url: google_recipe.url || "",
         version: 1,
-        tags: google_recipe.keywords ? google_recipe.keywords.split(', ') || [] : [], 
-        pics: extract_img_url()
+        tags: google_recipe.keywords && google_recipe.keywords.split ? google_recipe.keywords.split(',').map((x: string) => x.trim()) || [] : google_recipe.keywords || [], 
+        pic_urls: extract_img_url()
     });
 }

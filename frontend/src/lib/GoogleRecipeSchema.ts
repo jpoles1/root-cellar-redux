@@ -34,4 +34,5 @@ export interface GoogleRecipeSchema {
         name?: string;
         url?: string;
     }[];
+    keywords: any //string | string[]
 }
