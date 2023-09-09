@@ -50,7 +50,7 @@ const joined_pic_urls = (url_entity) => {
     const x = (recipe.pics || [])
         .map((pic) => pb.files.getUrl(recipe, pic, {'thumb': '250x250'}))
         .concat(recipe.pic_urls)
-        .filter((x: string) => x.trim() != "")
+        .filter((x: string) => x && x.trim() != "")
     console.log(x)
     return x
 }
