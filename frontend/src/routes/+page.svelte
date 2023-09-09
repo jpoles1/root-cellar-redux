@@ -1,5 +1,5 @@
 <script lang="ts">
-	import RecipeSearch from "./RecipeSearch.svelte";
+	import RecipeSearch from "$lib/RecipeSearch.svelte";
 </script>
 
 <RecipeSearch />

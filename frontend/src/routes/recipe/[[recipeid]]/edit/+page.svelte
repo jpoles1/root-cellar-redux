@@ -1,13 +1,14 @@
 <script lang="ts">
-	import TextInput from "@/TextInput.svelte";
-    import NumInput from "@/NumInput.svelte";
+	import TextInput from "$lib/input/TextInput.svelte";
+    import NumInput from "$lib/input/NumInput.svelte";
     import {Recipe, Ingredient, Instruction} from "$lib/root"
     import {debounce} from "$lib/debounce"
 	import { pb, uaccount } from "$lib/pocketbase";
     import { onDestroy, onMount } from 'svelte';
 	import { toast } from '@zerodevx/svelte-toast'
-	import AutoTextArea from "@/AutoTextArea.svelte";
-	import RecipeToolbar from "@/RecipeToolbar.svelte";
+	import AutoTextArea from "$lib/AutoTextArea/AutoTextArea.svelte";
+	import RecipeToolbar from "$lib/RecipeToolbar.svelte";
+    import Gallery from "$lib/gallery/Gallery.svelte";
 	import Icon from "@iconify/svelte";
 	import { goto } from "$app/navigation";
 
@@ -106,20 +107,7 @@
         // Save updates
         try_save_recipe();
     }
-    const rearrange_pics = (i: number, e: Event) => {
-        const etarget = e.target as any
-        let newi = parseInt(etarget.value)
-        if (isNaN(newi) || !recipe.pics) return;
-        newi--;
-        if (recipe === undefined) return;
-        // Blur input
-        etarget.blur();
-        // Rearranges instruction array
-        recipe.pics.splice(newi, 0, recipe.pics.splice(i, 1)[0]);
-        recipe.pics = [...recipe.pics]
-        // Save updates
-        try_save_recipe();
-    }
+
     const ingredient_delete_watch = (i: number, e: KeyboardEvent) => {
         if (e.key === 'Backspace') {
             if (recipe.ingredients[i].ingredient == "") {
@@ -171,21 +159,7 @@
             <TextInput placeholder="Original Recipe URL" bind:value="{recipe.og_url}" class="w-[500px] input-xs" on:input="{try_save_recipe}" />
         </div>
         <hr>
-        {#if recipe.pics && recipe.pics.length > 0}
-            <div class="flex justify-center my-10 space-x-4">
-                    {#each recipe.pics as pic, i (pic)}
-                        <figure class="h-[250px] relative">
-                            <div class="absolute top-0 right-0 p-2 bg-base-200 border border-base-300 rounded-bl-xl rounded-tr-xl">
-                                #<input type="number" min="1" value="{i + 1}" class="instruction-order-input bg-base-200" on:input="{(e) => rearrange_pics(i, e)}" />
-                            </div>
-                            <div class="absolute -bottom-0.5 right-0 p-2 bg-error rounded-tl-xl rounded-br-xl">
-                                <button on:click="{() => delete_pic(pic)}"><Icon icon="tabler:trash"/></button>
-                            </div>
-                            <img src="{pb.files.getUrl(recipe, pic, {'thumb': '250x250'})}" alt="Recipe Photo" class="rounded-xl border border-base-3 shadow"/>
-                        </figure>
-                    {/each}
-            </div>
-        {/if}
+        <Gallery recipe="{recipe}" editable="{true}"/>
         <div class="flex justify-center m-5">
             <div class="form-control w-full max-w-xs">
                 <label class="label">

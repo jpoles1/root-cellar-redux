@@ -1,13 +1,14 @@
 <script lang="ts">
-	import TextInput from "@/TextInput.svelte";
-    import NumInput from "@/NumInput.svelte";
+	import TextInput from "$lib/input/TextInput.svelte";
+    import NumInput from "$lib/input/NumInput.svelte";
     import {Recipe, Ingredient, Instruction} from "$lib/root"
     import {debounce} from "$lib/debounce"
 	import { pb, uaccount } from "$lib/pocketbase";
     import { onMount } from 'svelte';
 	import { toast } from '@zerodevx/svelte-toast'
-	import AutoTextArea from "@/AutoTextArea.svelte";
-	import RecipeToolbar from "@/RecipeToolbar.svelte";
+	import AutoTextArea from "$lib/AutoTextArea/AutoTextArea.svelte";
+	import RecipeToolbar from "$lib/RecipeToolbar.svelte";
+	import Gallery from "$lib/gallery/Gallery.svelte";
 
     export let data;
     let recipeid = data.recipeid;
@@ -45,13 +46,7 @@
         {#if recipe.pics && recipe.pics.length > 0}
             <hr>
             <div class="flex justify-center my-10 space-x-4">
-                {#if recipe.pics}
-                    {#each recipe.pics as pic, i (pic)}
-                        <figure class="h-[250px] relative">
-                            <img src="{pb.files.getUrl(recipe, pic, {'thumb': '250x250'})}" alt="Recipe Photo" class="rounded-xl border border-base-3 shadow"/>
-                        </figure>
-                    {/each}
-                {/if}
+                <Gallery bind:recipe="{recipe}" editable="{false}"/>
             </div>
         {/if}
         <hr>

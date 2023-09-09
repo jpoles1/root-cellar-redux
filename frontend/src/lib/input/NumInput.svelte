@@ -7,8 +7,8 @@
     export let alwaysfloatplaceholder: boolean = false;
 </script>
 
-<div class="form-control relative {$$props.class || ''} {noarrows ? 'nonumarrow' : ''}">
-    <input type="number" placeholder="{placeholder || ''}" disabled="{disabled}" bind:value="{value}" class="input input-sm {nofloatplaceholder ? '' : 'placeholder-transparent'} peer" on:input on:change on:keydown on:keyup>
+<div class="form-control relative {$$props.class || ''}">
+    <input type="number" placeholder="{placeholder || ''}" disabled="{disabled}" bind:value="{value}" class="input input-sm {nofloatplaceholder ? '' : 'placeholder-transparent'} {noarrows ? 'nonumarrow' : ''} peer" on:input on:change on:keydown on:keyup>
     {#if !nofloatplaceholder}
         {#if alwaysfloatplaceholder}
             <label class="label absolute left-4 pointer-events-none transition-all text-base-content text-opacity-50 -top-7 text-xs text-sm bg-transparent">
@@ -21,14 +21,3 @@
         {/if}
     {/if}
 </div>
-
-<style>
-    .nonumarrow input[type=number]::-webkit-inner-spin-button, 
-    .nonumarrow input[type=number]::-webkit-outer-spin-button { 
-        -webkit-appearance: none; 
-        margin: 0; 
-    }
-    .nonumarrow input[type=number] {
-        -moz-appearance: textfield;
-    }
-</style>

@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { pb, uaccount } from "$lib/pocketbase";
 	import { onMount } from "svelte";
-	import TextInput from "./TextInput.svelte";
 	import { debounce } from "$lib/debounce";
 	import Icon from "@iconify/svelte";
 	import { goto } from "$app/navigation";

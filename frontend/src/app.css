@@ -48,3 +48,13 @@ body {
       padding-inline-start: 30px;  
     }
   }
+
+  /* Remove num arrows from number input */
+  input.nonumarrow[type=number]::-webkit-inner-spin-button, 
+  input.nonumarrow[type=number]::-webkit-outer-spin-button { 
+      -webkit-appearance: none; 
+      margin: 0; 
+  }
+  input.nonumarrow[type=number] {
+      -moz-appearance: textfield;
+  }
