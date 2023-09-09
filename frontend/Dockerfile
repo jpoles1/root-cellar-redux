@@ -1,13 +1,13 @@
-FROM node
+FROM bun:1.0
 
 # install dependencies
 WORKDIR /app
 COPY package.json package-lock.json ./
-RUN npm ci
+RUN bun i
 
 COPY . .
 
-FROM node
+FROM bun:1.0
 
 WORKDIR /app
 COPY --from=0 /app .
@@ -15,4 +15,4 @@ COPY . .
 
 COPY docker.env .env
 
-RUN npm run build
+RUN bun run build
