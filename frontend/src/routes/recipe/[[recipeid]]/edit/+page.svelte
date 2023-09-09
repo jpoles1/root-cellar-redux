@@ -1,7 +1,7 @@
 <script lang="ts">
 	import TextInput from "$lib/input/TextInput.svelte";
     import NumInput from "$lib/input/NumInput.svelte";
-    import {Recipe, Ingredient, Instruction} from "$lib/root"
+    import {Recipe, Ingredient, Instruction, txt_to_ingredients, txt_to_instructions} from "$lib/root"
     import {debounce} from "$lib/debounce"
 	import { pb, uaccount } from "$lib/pocketbase";
     import { onDestroy, onMount } from 'svelte';
@@ -26,7 +26,7 @@
         if (!show_raw_ingredients) {
             raw_ingredients = regen_raw_ingredients()
         } else {
-            recipe.ingredients = recipe.txt_to_ingredients(raw_ingredients)
+            recipe.ingredients = txt_to_ingredients(raw_ingredients)
         }
         show_raw_ingredients = !show_raw_ingredients
     }
@@ -38,7 +38,7 @@
         if (!show_raw_instructions) {
             raw_instructions = regen_raw_instructions()
         } else {
-            recipe.instructions = recipe.txt_to_instructions(raw_instructions)
+            recipe.instructions = txt_to_instructions(raw_instructions)
         }
         show_raw_instructions = !show_raw_instructions
     }
