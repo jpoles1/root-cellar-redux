@@ -11,7 +11,7 @@ services:
       - ./pb/pb_migrations:/usr/local/bin/pb_migrations
   web:
     build: ./frontend
-    entrypoint: npm run serve
+    entrypoint: npm run serve:prod
     restart: always
     ports:
-      - 4005:5763
+      - 4005:4005

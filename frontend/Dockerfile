@@ -1,13 +1,13 @@
-FROM bun:1.0
+FROM oven/bun:1.0
 
 # install dependencies
 WORKDIR /app
-COPY package.json package-lock.json ./
+COPY package.json bun.lockb ./
 RUN bun i
 
 COPY . .
 
-FROM bun:1.0
+FROM node
 
 WORKDIR /app
 COPY --from=0 /app .
@@ -15,4 +15,4 @@ COPY . .
 
 COPY docker.env .env
 
-RUN bun run build
+#RUN bun run build
