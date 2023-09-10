@@ -1,0 +1,30 @@
+<script lang="ts">
+    // Import Tesseract object
+    import Tesseract from 'tesseract.js';
+    import { fileOpen } from "browser-fs-access";
+
+    const ocr_file = async () => {
+        // Prompt the user to pick a file
+        const filePicked = await fileOpen({
+            mimeTypes: ["image/*"],
+        });
+
+        // Invoke Tesseract recognition
+        const result = await Tesseract.recognize(
+            filePicked,
+            'eng',
+            // In case you want to log the internals of the recognition
+            { logger: m => console.log(m) }
+        );
+
+        // while there are many options inside result.data
+        // we use the text property
+        for (const item of result.data.lines) {
+            // Do a bit of cleanup. In this case, keep only a-z A-Z _ - 0-9 . characters
+            let clean = item.text.replace(/[^a-zA-Z_\-0-9 \.]*/, '').trim();
+
+            // add the clean line to a result collection
+            importItemsDisplay.value.push({ isSelected: false, text: clean });
+        }
+    }
+</script>
