@@ -56,17 +56,17 @@
             <progress class="progress w-56"></progress>
         </div>
     {/if}
-    <div class="flex justify-center space-x-5 space-y-5 w-full flex-wrap overflow-y-auto max-h-full">
+    <div class="flex justify-center w-full flex-wrap overflow-y-auto max-h-full">
         {#each recipes as recipe}
-            <div class="card overflow-hidden w-[300px] bg-base-100">
+            <div class="card overflow-hidden w-[250px] bg-base-100 mt-5 ml-5">
                 <a href="/recipe/{recipe.id}/view">
                     <figure class="h-[200px]">
                         <img src="{recipe.pics[0] ? pb.files.getUrl(recipe, recipe.pics[0], {'thumb': '100x200'}) : (recipe.pic_urls ? recipe.pic_urls[0] : '/sprout_wide.png') || '/sprout_wide.png'}" alt="Recipe Photo" />
                     </figure>
                 </a>
-                <div class="card-body">
+                <div class="card-body p-4">
                     <div class="h-[100px]">
-                        <h3 class="card-title">{recipe.title}</h3>
+                        <div class="card-title text-[16px]">{recipe.title}</div>
                         {#if recipe.servings}
                             <i>Servings: {recipe.servings}</i>
                         {/if}
