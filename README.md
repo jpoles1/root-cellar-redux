@@ -18,10 +18,13 @@ I've rewritten the entire project using SvelteKit + Pocketbase in order to unify
 ### Project Structure
 
 - pb: contains all Pocketbase configuration/data
-    > pb_migrations: contains migrations to setup the PocketBase SQLite database
-    > pb_data: a shared volume with the Docker environment allowing persistence of database files
-    > Dockerfile: builds a Pocketbase container
+    - pb_migrations: contains migrations to setup the PocketBase SQLite database
+    - pb_data: a shared volume with the Docker environment allowing persistence of database files
+    - Dockerfile: builds a Pocketbase container
 - web: contains all Sveltekit files to build the combined Frontend + Backend
-    > src: all source code
-        > routes: Sveltekit files, project structure dictates routing
-        > lib: contains Svelte components and other js utilities
+    - .env: Used to set env variables in the local dev environment 
+        - _Note: this file does not affect env variables in the docker container (see below)_
+    - docker.env: Automatically copied from docker.env to .env on Dockerfile build.
+    - src: all source code
+        - routes: Sveltekit files, project structure dictates routing
+        - lib: contains Svelte components and other js utilities
