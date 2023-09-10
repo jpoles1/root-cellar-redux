@@ -1,5 +1,7 @@
-import * as iparser from "$lib/ingredient-parser";
-import type { GoogleRecipeSchema } from "./GoogleRecipeSchema";
+import * as iparser from "$lib/ingredient-parser"
+import type { GoogleRecipeSchema } from "./GoogleRecipeSchema"
+
+export type Picture = string[]
 
 export class Ingredient {
 	quantity = 0
@@ -8,7 +10,7 @@ export class Ingredient {
     notes = ""
     
     constructor(data?: Partial<Ingredient>) {
-        Object.assign(this, data);
+        Object.assign(this, data)
     }
 }
 
@@ -19,7 +21,20 @@ export class Instruction {
     optional = false 
     
     constructor(data?: Partial<Instruction>) {
-        Object.assign(this, data);
+        Object.assign(this, data)
+    }
+}
+
+export class RecipeRating {
+    rid: string //recipe id
+    rating: number //1-5 scale
+    comments?: string
+    pics?: Picture[]
+
+    constructor(rid: string, rating: number, data?: Partial<RecipeRating>) {
+        this.rid = rid
+        this.rating = rating
+        Object.assign(this, data)
     }
 }
 
@@ -30,7 +45,7 @@ export const txt_to_ingredients = (txt: string): Ingredient[] => {
         .filter(x => x.length > 0)
         .map((x) => x.replace(/, (.*)$/, "($1)")) // Takes words after commas at end of ingredient and puts them into parenthesis to turn them into notes
         .map(x => iparser.parse(x) as Ingredient)
-    return ingredient_list;
+    return ingredient_list
 }
 
 export const txt_to_instructions = (txt: string): Instruction[] => {
@@ -52,8 +67,8 @@ export const txt_to_instructions = (txt: string): Instruction[] => {
                     optional,
                 } as Instruction)
             }
-        );
-    return instruction_list;
+        )
+    return instruction_list
 }
 
 //Recipe contains data regarding a recipe for a certain dish
@@ -78,7 +93,7 @@ export class Recipe {
     last_updated: number = Date.now()
 
     constructor(data?: Partial<Recipe>) {
-        Object.assign(this, data);
+        Object.assign(this, data)
     }
 
     ingredients_to_txt(): string {
@@ -102,8 +117,8 @@ export class Recipe {
 export const recipe_from_google_recipe = (google_recipe: GoogleRecipeSchema): Recipe => {
     console.log(`@type = ${google_recipe["@type"]}`)
     if (google_recipe["@type"] != "Recipe") {
-        if (google_recipe["@graph"]) {
-            const graph_search = google_recipe["@graph"].filter((x) => x["@type"] == "Recipe")
+        if ((google_recipe as any)["@graph"]) {
+            const graph_search = (google_recipe as any)["@graph"].filter((x: any) => x["@type"] == "Recipe")
             if(graph_search[0]) {
                 google_recipe = graph_search[0]
             }
@@ -112,7 +127,7 @@ export const recipe_from_google_recipe = (google_recipe: GoogleRecipeSchema): Re
     const extract_img_url = () => {
         const img: any = google_recipe.image
         console.log(img)
-        if (img.url) return img.url
+        if (img.url) return [img.url]
         if (typeof img === "string") return [img]
         if (typeof img[0] === "string") return img
         if (typeof img[0] === "object") return img.map((x: any) => x.url)
@@ -120,16 +135,16 @@ export const recipe_from_google_recipe = (google_recipe: GoogleRecipeSchema): Re
     }
     const extract_ingredients = () => {
         const raw_ingred = google_recipe.recipeIngredient
-        const ingredients = Array.isArray(raw_ingred) ? raw_ingred.join('\n') : typeof raw_ingred === 'string' ? raw_ingred : '';
+        const ingredients = Array.isArray(raw_ingred) ? raw_ingred.join('\n') : typeof raw_ingred === 'string' ? raw_ingred : ''
         return ingredients
     }
     const extract_instructions = () => {
         const raw_instruct = google_recipe.recipeInstructions
-        const instructions = Array.isArray(raw_instruct) ? raw_instruct.map((instruction: any) => instruction.text || "").join('\n') : typeof raw_instruct === 'string' ? raw_instruct : '';
+        const instructions = Array.isArray(raw_instruct) ? raw_instruct.map((instruction: any) => instruction.text || "").join('\n') : typeof raw_instruct === 'string' ? raw_instruct : ''
         return instructions
     }
     return new Recipe({
-        title: google_recipe.name || "Unnamed Recipe",
+        title: google_recipe.name.replace(/recipe[,:\s]*/i, "").trim() || "Unnamed Recipe",
         description: google_recipe.description || "",
         ingredients: txt_to_ingredients(extract_ingredients()),
         instructions: txt_to_instructions(extract_instructions()),
@@ -140,5 +155,5 @@ export const recipe_from_google_recipe = (google_recipe: GoogleRecipeSchema): Re
         version: 1,
         tags: google_recipe.keywords && google_recipe.keywords.split ? google_recipe.keywords.split(',').map((x: string) => x.trim()) || [] : google_recipe.keywords || [], 
         pic_urls: extract_img_url()
-    });
+    })
 }
