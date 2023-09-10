@@ -10,7 +10,7 @@
     export let data;
     let recipe_url = "";
     let import_started = false;
-    let failure_count = 2;
+    let failure_count = 0;
 
     const import_recipe = async (): Promise<Recipe | undefined> => {
         if (import_started) {
