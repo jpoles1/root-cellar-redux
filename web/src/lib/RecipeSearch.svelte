@@ -9,8 +9,9 @@
 
     let recipes: Recipe[] = []
     let search_query = $page.url.searchParams.get("query") || "";
-    let filter_archived = $page.url.searchParams.get("archived") == "true";
+    let filter_archived = ($page.url.searchParams.get("archived") || 'true') == "true";
     let filter_my_recipes = $page.url.searchParams.get("my_recipes") == "true";
+    let filter_private_recipes = $page.url.searchParams.get("private_recipes") == "true";
     let searching = false;
     
     const search_recipes = async () => {
@@ -18,10 +19,16 @@
         let title_search = search_query ? `(title ?~ '${search_query}' || ingredients ?~ '${search_query}' || tags ?~ '${search_query}')` : undefined
         let archived_search = filter_archived ? `(archived=false)` : undefined
         let my_recipe_search = filter_my_recipes && $uaccount && $uaccount.id ? `(uid='${$uaccount.id}')` : undefined
-        let filter_parts = [title_search, archived_search, my_recipe_search].filter((x) => x)
+        let private_recipe_search = filter_private_recipes && $uaccount && $uaccount.id ? `(public=false)` : undefined
+        let filter_parts = [title_search, archived_search, my_recipe_search, private_recipe_search].filter((x) => x)
         let filter_str = filter_parts.join("&&")
-        recipes = await pb.collection("recipes").getFullList({filter: filter_str, sort: '-created', limit: 100})
-        goto (`/?query=${search_query}&archived=${filter_archived}&my_recipes=${filter_my_recipes}`)
+        let filter_obj: any = {filter: filter_str, sort: '-created', limit: 100}
+        /*if($uaccount && $uaccount.admin) {
+            // Get more user info for admins
+            filter_obj.expand = "uid"
+        }*/
+        recipes = await pb.collection("recipes").getFullList(filter_obj)
+        goto (`/?query=${search_query}&archived=${filter_archived}&my_recipes=${filter_my_recipes}&private_recipes=${filter_private_recipes}`)
         searching = false
     }
     let search_debounce = debounce(search_recipes, 500, 1000)
@@ -41,12 +48,15 @@
         <div class="flex-grow mx-auto"> 
             <input type="text" placeholder="Search Recipes..." bind:value="{search_query}" class="input w-full text-[14pt] text-center p-5" on:input="{try_search_recipes}"/>
         </div>
-        <div class="flex align-top flex-col max-md:flex-row max-md:justify-around max-md:mt-5 ml-5">
+        <div class="flex align-top flex-col flex-wrap max-h-[60px] max-md:flex-row max-md:justify-around max-md:mt-5 ml-5 space-x-5">
             <div>
                 <input type="checkbox" bind:checked="{filter_archived}" on:input="{fast_search_debounce}" /> Hide Archived
             </div>
             <div>
                 <input type="checkbox" bind:checked="{filter_my_recipes}" on:input="{fast_search_debounce}" /> My Recipes
+            </div>
+            <div>
+                <input type="checkbox" bind:checked="{filter_private_recipes}" on:input="{fast_search_debounce}" /> Private Recipes
             </div>
         </div>
     </div>
@@ -62,15 +72,16 @@
         {#each recipes as recipe}
             <div class="card overflow-hidden w-[250px] bg-base-100 mt-5 ml-5">
                 <a href="/recipe/{recipe.id}/view">
-                    <figure class="h-[200px]">
-                        <img src="{recipe.pics[0] ? pb.files.getUrl(recipe, recipe.pics[0], {'thumb': '100x200'}) : (recipe.pic_urls ? recipe.pic_urls[0] : '/sprout_wide.png') || '/sprout_wide.png'}" alt="Recipe Photo" />
+                    <figure class="h-[160px]">
+                        <img src="{recipe.pics[0] ? pb.files.getUrl(recipe, recipe.pics[0], {'thumb': '160x100'}) : (recipe.pic_urls ? recipe.pic_urls[0] : '/sprout_wide.png') || '/sprout_wide.png'}" alt="Recipe Photo" />
                     </figure>
                 </a>
                 <div class="card-body p-4">
-                    <div class="h-[100px] flex flex-col text-sm">
+                    <div class="h-[140px] flex flex-col text-sm overflow-y-auto">
                         <div class="card-title text-[16px]">{recipe.title}</div>
                         {#if $uaccount && $uaccount.admin}
-                            <span>User: <a class="link" href="/user/{recipe.uid}">{(recipe.uid || '').slice(0, 8)}</a></span>
+                            <span>User: <a class="link" href="/user/{recipe.uid}">{recipe.expand.uid ? `${recipe.expand.uid.username}#` : '' }{(recipe.uid || '').slice(0, 8)}</a></span>
+                            <span><a class="link" href="/user/{recipe.uid}">{recipe.expand.uid ? recipe.expand.uid.email || '' : ''}</a></span>
                         {/if}
                         {#if recipe.servings}
                             <i>Servings: {recipe.servings}</i>

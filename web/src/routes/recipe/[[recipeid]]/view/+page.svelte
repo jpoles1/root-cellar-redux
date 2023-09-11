@@ -38,9 +38,11 @@
             <div class="m-auto w-[800px] max-w-[96%] text-[28pt] text-center mb-4">
                 {recipe.title}
             </div>
-            <div class="m-auto max-w-[80%] text-center p-4 bg-info rounded">
-                {recipe.description}
-            </div>
+            {#if recipe.description.length > 3}
+                <div class="m-auto max-w-[80%] text-center p-4 bg-info rounded">
+                    {recipe.description}
+                </div>
+            {/if}
         </div>
         <div class="flex justify-center space-x-8 mb-5">
             <NumInput placeholder="# of Servings" bind:value="{recipe.servings}" class="w-24 border" noarrows alwaysfloatplaceholder disabled />
