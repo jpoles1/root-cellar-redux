@@ -12,6 +12,7 @@
 	import Icon from "@iconify/svelte";
 	import { goto } from "$app/navigation";
 	import { page } from "$app/stores";
+	import TagEditor from "$lib/TagEditor.svelte";
 
     export let data;
     let recipeid = data.recipeid;
@@ -170,6 +171,9 @@
         </div>
         <div class="max-w-[80%] mx-auto mb-8">
             <AutoTextArea bind:value="{recipe.description}" placeholder="Description" on:input="{try_save_recipe}"/>
+        </div>
+        <div class="max-w-[80%] mx-auto mb-8">
+            <TagEditor bind:recipe="{recipe}" on:save="{try_save_recipe}" class="z-1000"/>
         </div>
         <div class="flex justify-center space-x-8 m-5">
             <NumInput placeholder="# of Servings" bind:value="{recipe.servings}" on:input="{try_save_recipe}" class="w-24" noarrows alwaysfloatplaceholder />
