@@ -12,6 +12,6 @@ module.exports = {
 	},
 	plugins: [typography,require("daisyui")],
 	daisyui: {
-		themes: ["winter"],
+		themes: ["lemonade"],
 	  },	
 }
