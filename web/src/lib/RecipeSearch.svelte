@@ -38,7 +38,7 @@
     }
 
     onMount(async () => {
-        if(!$uaccount) goto("/login");
+        if(!$uaccount) goto("/login"); return
         search_recipes()
     })
 </script>
