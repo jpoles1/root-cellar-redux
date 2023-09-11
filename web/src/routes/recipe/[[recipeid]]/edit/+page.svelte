@@ -142,7 +142,13 @@
             add_ingredient()
             add_instruction()
         } else {
-            recipe = new Recipe(await pb.collection("recipes").getOne(recipeid))
+            recipe = new Recipe(await pb.collection("recipes").getOne(recipeid).catch((r) => {
+                    toast.push("Error loading recipe, returning to home page...")
+                    setTimeout(() => {
+                        goto("/")
+                    }, 3000)
+                    return r
+            }))
             if ($uaccount && recipe.uid != $uaccount.id) goto("/")
         }
         raw_ingredients = regen_raw_ingredients()

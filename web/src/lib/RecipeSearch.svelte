@@ -5,13 +5,14 @@
 	import Icon from "@iconify/svelte";
 	import { goto } from "$app/navigation";
 	import type { Recipe } from "./root";
+	import { page } from "$app/stores";
 
     let recipes: Recipe[] = []
-    let search_query = "";
-    let filter_archived = false;
-    let filter_my_recipes = false;
+    let search_query = $page.url.searchParams.get("query") || "";
+    let filter_archived = $page.url.searchParams.get("archived") == "true";
+    let filter_my_recipes = $page.url.searchParams.get("my_recipes") == "true";
     let searching = false;
-
+    
     const search_recipes = async () => {
         searching = true
         let title_search = search_query ? `(title ?~ '${search_query}' || ingredients ?~ '${search_query}' || tags ?~ '${search_query}')` : undefined
@@ -20,10 +21,11 @@
         let filter_parts = [title_search, archived_search, my_recipe_search].filter((x) => x)
         let filter_str = filter_parts.join("&&")
         recipes = await pb.collection("recipes").getFullList({filter: filter_str, sort: '-created', limit: 100})
+        goto (`/?query=${search_query}&archived=${filter_archived}&my_recipes=${filter_my_recipes}`)
         searching = false
     }
     let search_debounce = debounce(search_recipes, 500, 1000)
-    let fast_search_debounce = debounce(search_recipes, 150, 1000)
+    let fast_search_debounce = debounce(search_recipes, 250, 0)
     const try_search_recipes = () => {
         search_debounce()
     }
@@ -65,10 +67,10 @@
                     </figure>
                 </a>
                 <div class="card-body p-4">
-                    <div class="h-[100px] flex flex-col">
+                    <div class="h-[100px] flex flex-col text-sm">
                         <div class="card-title text-[16px]">{recipe.title}</div>
                         {#if $uaccount && $uaccount.admin}
-                            <a class="link" href="/user/{recipe.uid}">{(recipe.uid || '').slice(0, 8)}</a>
+                            <span>User: <a class="link" href="/user/{recipe.uid}">{(recipe.uid || '').slice(0, 8)}</a></span>
                         {/if}
                         {#if recipe.servings}
                             <i>Servings: {recipe.servings}</i>

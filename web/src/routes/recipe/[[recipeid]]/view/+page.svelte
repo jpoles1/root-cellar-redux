@@ -6,9 +6,9 @@
 	import { pb, uaccount } from "$lib/pocketbase";
     import { onMount } from 'svelte';
 	import { toast } from '@zerodevx/svelte-toast'
-	import AutoTextArea from "$lib/AutoTextArea/AutoTextArea.svelte";
 	import RecipeToolbar from "$lib/RecipeToolbar.svelte";
 	import Gallery from "$lib/gallery/Gallery.svelte";
+	import { goto } from "$app/navigation";
 
     export let data;
     let recipeid = data.recipeid;
@@ -21,7 +21,13 @@
         if (recipeid == undefined || recipeid == "") {
             recipe = new Recipe()
         } else {
-            recipe = new Recipe(await pb.collection("recipes").getOne(recipeid))
+            recipe = new Recipe(await pb.collection("recipes").getOne(recipeid).catch((r) => {
+                    toast.push("Error loading recipe, returning to home page...")
+                    setTimeout(() => {
+                        goto("/")
+                    }, 3000)
+                    return r
+            }))
         }
     });
 </script>
