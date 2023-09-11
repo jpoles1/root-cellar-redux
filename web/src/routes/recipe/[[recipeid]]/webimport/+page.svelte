@@ -27,13 +27,10 @@
         }).then(async (resp) => {
             let script_matches = await resp.json()
             let first_match = JSON.parse(script_matches[0])
-            console.log("first_match", first_match)
             const google_recipe = first_match[0] || first_match
-            console.log(google_recipe)
             const recipe = recipe_from_google_recipe(google_recipe)
             recipe.uid = $uaccount!.id
             recipe.og_url = recipe_url
-            console.log(recipe)
             const new_recipe = await pb.collection("recipes").create(recipe)
             goto(`/recipe/${new_recipe.id}/edit`)
         }).catch((e) => {

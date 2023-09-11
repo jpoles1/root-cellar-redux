@@ -12,10 +12,6 @@ routerAdd("GET", "/rootapi/tags", (c) => {
         .newQuery("SELECT DISTINCT tags FROM recipes LIMIT 10000")
         .all(result) // throw an error on db failure
     
-    if (result.length > 0) {
-        console.log(result[0].id)
-    }
-    
     return c.json(200, { result })
 })
 

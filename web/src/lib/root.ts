@@ -116,7 +116,6 @@ export class Recipe {
 }
 
 export const recipe_from_google_recipe = (google_recipe: GoogleRecipeSchema): Recipe => {
-    console.log(`@type = ${google_recipe["@type"]}`)
     if (google_recipe["@type"] != "Recipe") {
         if ((google_recipe as any)["@graph"]) {
             const graph_search = (google_recipe as any)["@graph"].filter((x: any) => x["@type"] == "Recipe")
@@ -127,7 +126,6 @@ export const recipe_from_google_recipe = (google_recipe: GoogleRecipeSchema): Re
     }
     const extract_img_url = () => {
         const img: any = google_recipe.image
-        console.log(img)
         if (img.url) return [img.url]
         if (typeof img === "string") return [img]
         if (typeof img[0] === "string") return img
@@ -155,7 +153,7 @@ export const recipe_from_google_recipe = (google_recipe: GoogleRecipeSchema): Re
         archived: false,
         public: true,
         version: 1,
-        tags: google_recipe.keywords && google_recipe.keywords.split ? google_recipe.keywords.split(',').map((x: string) => x.trim()) || [] : google_recipe.keywords || [], 
+        tags: google_recipe.keywords && google_recipe.keywords.split ? google_recipe.keywords.split(',').map((x: string) => x.trim().toLowerCase()) || [] : google_recipe.keywords.map((x: string) => x.toLowerCase()) || [], 
         pic_urls: extract_img_url()
     })
 }

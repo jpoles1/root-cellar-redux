@@ -13,10 +13,7 @@ import { pb, uaccount } from "$lib/pocketbase";
 
     onMount(async () => {
         if (url_uid && ($uaccount && ($uaccount.id == url_uid || $uaccount.admin))) {
-            console.log(udata)
-            console.log(url_uid)
             udata = await pb.collection("users").getOne(url_uid)
-            console.log(udata)
         }
     })
 

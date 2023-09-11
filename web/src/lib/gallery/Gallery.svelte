@@ -27,7 +27,6 @@ const delete_pic = async (pic: any) => {
     recipe = new Recipe(await pb.collection("recipes").update(recipe.id, {'pics-': [pic]}))
 }
 const delete_pic_url = async (pic_url: any) => {
-    console.log(pic_url)
     recipe.pic_urls = recipe.pic_urls.filter((x) => x != pic_url)
     recipe.pic_urls = [...recipe.pic_urls]
     recipe = new Recipe(await pb.collection("recipes").update(recipe.id, {pic_urls: recipe.pic_urls}))
@@ -39,7 +38,6 @@ let lightbox_pic: string | undefined;
 
 const open_lightbox = (pic: string) => {
     lightbox_pic = pic
-    console.log(lightbox_controller)
     lightbox_controller.open()
 }
 const close_lightbox = () => {
@@ -51,7 +49,6 @@ const joined_pic_urls = (url_entity) => {
         .map((pic) => pb.files.getUrl(recipe, pic, {'thumb': '250x250'}))
         .concat(recipe.pic_urls)
         .filter((x: string) => x && x.trim && x.trim() != "")
-    console.log(x)
     return x
 }
 
