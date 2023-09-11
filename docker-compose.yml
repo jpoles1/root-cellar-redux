@@ -9,6 +9,7 @@ services:
     volumes:
       - ./pb/pb_data:/usr/local/bin/pb_data
       - ./pb/pb_migrations:/usr/local/bin/pb_migrations
+      - ./pb/pb_hooks:/usr/local/bin/pb_hooks
   web:
     build: ./web
     entrypoint: npm run serve
