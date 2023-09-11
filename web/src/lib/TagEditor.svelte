@@ -1,6 +1,5 @@
 <script lang="ts">
     import Tags from './TagInput.svelte'
-    import Tags2 from 'svelte-tags-input'
     import { onMount } from "svelte";
 	import { pb } from './pocketbase';
 	import type { Recipe } from './root';
