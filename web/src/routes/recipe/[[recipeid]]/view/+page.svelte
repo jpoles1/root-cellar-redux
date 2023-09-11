@@ -34,9 +34,12 @@
 
 <div> 
     {#if recipe}
-        <div class="flex justify-center mb-10">
-            <div class="m-auto w-[800px] max-w-[96%] text-[28pt] text-center p-8">
+        <div class="flex flex-col justify-center mb-10">
+            <div class="m-auto w-[800px] max-w-[96%] text-[28pt] text-center mb-4">
                 {recipe.title}
+            </div>
+            <div class="m-auto max-w-[80%] text-center p-4 bg-info rounded">
+                {recipe.description}
             </div>
         </div>
         <div class="flex justify-center space-x-8 mb-5">

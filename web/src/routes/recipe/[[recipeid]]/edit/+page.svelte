@@ -165,10 +165,13 @@
 
 <div> 
     {#if recipe}
-        <div class="flex justify-center mb-10">
+        <div class="flex justify-center mb-5">
             <input type="text" placeholder="Recipe Name" bind:value="{recipe.title}" class="input m-auto w-[800px] max-w-[96%] text-[28pt] text-center p-8" on:input="{try_save_recipe}"/>
         </div>
-        <div class="flex justify-center space-x-8 mb-5">
+        <div class="max-w-[80%] mx-auto mb-8">
+            <AutoTextArea bind:value="{recipe.description}" placeholder="Description" on:input="{try_save_recipe}"/>
+        </div>
+        <div class="flex justify-center space-x-8 m-5">
             <NumInput placeholder="# of Servings" bind:value="{recipe.servings}" on:input="{try_save_recipe}" class="w-24" noarrows alwaysfloatplaceholder />
             <NumInput placeholder="Active Time" bind:value="{recipe.active_time}" on:input="{try_save_recipe}" class="w-24" noarrows alwaysfloatplaceholder />
             <NumInput placeholder="Total Time" bind:value="{recipe.total_time}" on:input="{try_save_recipe}" class="w-24" noarrows alwaysfloatplaceholder />
@@ -177,7 +180,7 @@
             <TextInput placeholder="Original Recipe URL" bind:value="{recipe.og_url}" class="w-[500px] input-xs" on:input="{try_save_recipe}" />
         </div>
         <hr>
-        <div class="card shadow p-2">
+        <div class="card shadow p-2 bg-base-100">
             <div class="text-xl text-center font-medium cursor-pointer {show_photo_editor ? 'border-b border-b-base-300 pb-2' : ''}" on:click="{() => show_photo_editor = !show_photo_editor}">
                 Photo Editor
                 <div class="float-right">
