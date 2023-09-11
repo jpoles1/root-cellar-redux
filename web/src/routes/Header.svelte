@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { uaccount } from "$lib/pocketbase";
+    import { pb, uaccount } from "$lib/pocketbase";
 	import Icon from '@iconify/svelte';
 </script>
 
@@ -46,6 +46,17 @@
                 <Icon icon="typcn:camera" /> Import
             </a>
             <a class="btn btn-sm" href="/logout">Logout</a>
+            <div class="avatar {$uaccount.avatar ? '' : 'placeholder' }">
+                <div class="w-8 rounded-full shadow-lg cursor-pointer">
+                    <a href="/user/">
+                        {#if $uaccount.avatar}
+                            <img src="{pb.files.getUrl($uaccount, $uaccount.avatar, {'thumb': '100x100'})}"/>
+                        {:else}
+                            <span class="text-xl">?</span>
+                        {/if}
+                    </a>
+                </div>
+            </div>
         {/if}
     </div>
 </div>
