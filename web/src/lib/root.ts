@@ -83,6 +83,7 @@ export class Recipe {
 	active_time?: number = 0
 	total_time?: number = 0	
 	archived = false
+    public = true
     og_id = ""
     og_url = ""
     version = 1
@@ -152,6 +153,7 @@ export const recipe_from_google_recipe = (google_recipe: GoogleRecipeSchema): Re
         //active_time: google_recipe.cookTime || 0,
         //total_time: google_recipe.totalTime || 0,
         archived: false,
+        public: true,
         version: 1,
         tags: google_recipe.keywords && google_recipe.keywords.split ? google_recipe.keywords.split(',').map((x: string) => x.trim()) || [] : google_recipe.keywords || [], 
         pic_urls: extract_img_url()

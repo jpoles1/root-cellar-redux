@@ -24,6 +24,12 @@
             goto(`/recipe/${new_recipe.id}/edit`, {invalidateAll: true})
         }
     }
+    const toggle_public = async () => {
+        if(!recipe.public || confirm("Are you sure you want to make this recipe private?")) {
+            recipe.public = !recipe.public
+            await pb.collection("recipes").update(recipe.id, recipe)
+        }
+    }
     const toggle_archive = async () => {
         if(recipe.archived || confirm("Are you sure you want to archive this recipe?")) {
             recipe.archived = !recipe.archived
@@ -48,7 +54,10 @@
             <Icon icon="system-uicons:duplicate" class="font-bold"/> Duplicate
         </btn>
         {#if owner}
-            <btn class="btn btn-primary btn-sm font-bold" on:click="{toggle_archive}">
+            <btn class="btn {recipe.public ? 'btn-warning' : 'btn-success'} btn-sm font-bold" on:click="{toggle_public}">
+                <Icon icon="system-uicons:archive" class="font-bold"/> {recipe.public ? 'Go Private' : 'Go Public' }
+            </btn>
+            <btn class="btn btn-error btn-sm font-bold" on:click="{toggle_archive}">
                 <Icon icon="system-uicons:archive" class="font-bold"/> {recipe.archived ? 'Unarchive' : 'Archive' }
             </btn>
         {/if}

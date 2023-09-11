@@ -8,7 +8,7 @@
 
     let recipes: Recipe[] = []
     let search_query = "";
-    let filter_archived = true;
+    let filter_archived = false;
     let filter_my_recipes = false;
     let searching = false;
 
@@ -65,14 +65,27 @@
                     </figure>
                 </a>
                 <div class="card-body p-4">
-                    <div class="h-[100px]">
+                    <div class="h-[100px] flex flex-col">
                         <div class="card-title text-[16px]">{recipe.title}</div>
+                        {#if $uaccount && $uaccount.admin}
+                            <a class="link" href="/user/{recipe.uid}">{(recipe.uid || '').slice(0, 8)}</a>
+                        {/if}
                         {#if recipe.servings}
                             <i>Servings: {recipe.servings}</i>
                         {/if}
                     </div>
                     <div class="card-actions justify-end">
+                        {#if recipe.archived}
+                            <button class="btn btn-primary btn-sm tooltip tooltip-warning" data-tip="Archived">
+                                <Icon icon="system-uicons:archive" class="font-bold"/>
+                            </button>
+                        {/if}
                         {#if $uaccount && $uaccount.id == recipe.uid}
+                            {#if !recipe.public}
+                                <button class="btn btn-primary btn-sm font-bold tooltip tooltip-warning" data-tip="Private">
+                                    <Icon icon="fa6-solid:key" class="font-bold"/>
+                                </button>
+                            {/if}
                             <a class="btn btn-primary btn-sm font-bold" href="/recipe/{recipe.id}/edit">
                                 <Icon icon="fa6-solid:pencil" class="font-bold"/>
                             </a>
