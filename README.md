@@ -1,5 +1,7 @@
 # Root Cellar
 
+![image](https://github.com/jpoles1/root-cellar-redux/assets/366282/ce013ce7-64bb-4666-879e-01ba904d0141)
+
 The goals of this project are to provide an open-source, light-weight, fully dockerized, self-hostable recipe management system. 
 
 This is a complete rewrite of my original recipe management system [Root Cellar](https://github.com/jpoles1/root-cellar), which originally used a stack of: 
