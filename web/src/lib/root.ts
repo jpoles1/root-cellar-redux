@@ -56,7 +56,7 @@ export const txt_to_instructions = (txt: string): Instruction[] => {
         .map(
             (instruction) => {
                 let optional = false
-                instruction = instruction.replace(/^\d[).]\w*/, "")
+                instruction = instruction.replace(/^(?:\d+[).]\s*)+/, "")
                 if (instruction.match(/\(Optional\)/g)) {
                     optional = true
                 }
