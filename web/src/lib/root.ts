@@ -56,7 +56,7 @@ export const txt_to_instructions = (txt: string): Instruction[] => {
         .map(
             (instruction) => {
                 let optional = false
-                instruction = instruction.replace(/^\d[).]\w*/, "")
+                instruction = instruction.replace(/^(?:\d+[).]\s*)+/, "")
                 if (instruction.match(/\(Optional\)/g)) {
                     optional = true
                 }
@@ -90,6 +90,14 @@ export class Recipe {
     tags: string[] = []
     pics?: any
     pic_urls: string[] = []
+    serving_size = ""
+    calories?: number
+    fat?: number
+    carbs?: number
+    protein?: number
+    fiber?: number
+    sugar?: number
+    sodium?: number
     created: number = Date.now()
     last_updated: number = Date.now()
 

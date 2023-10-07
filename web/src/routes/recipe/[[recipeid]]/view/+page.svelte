@@ -9,6 +9,7 @@
 	import RecipeToolbar from "$lib/RecipeToolbar.svelte";
 	import Gallery from "$lib/gallery/Gallery.svelte";
 	import { goto } from "$app/navigation";
+	import Nutrition from "$lib/Nutrition.svelte";
 
     export let data;
     let recipeid = data.recipeid;
@@ -59,6 +60,10 @@
         </div>
         <hr>
         <RecipeToolbar recipe="{recipe}" viewing/>
+        <hr>
+        <div class="flex justify-center">
+            <Nutrition recipe="{recipe}" editable="{false}"/>
+        </div>
         <hr>
         <div>
             <div class="flex justify-around flex-wrap">

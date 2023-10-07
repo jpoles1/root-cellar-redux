@@ -13,6 +13,7 @@
 	import { goto } from "$app/navigation";
 	import { page } from "$app/stores";
 	import TagEditor from "$lib/TagEditor.svelte";
+	import Nutrition from "$lib/Nutrition.svelte";
 
     export let data;
     let recipeid = data.recipeid;
@@ -216,6 +217,10 @@
         </div>
         <hr>
         <RecipeToolbar recipe="{recipe}" editing/>
+        <hr>
+        <div class="flex justify-center">
+            <Nutrition recipe="{recipe}" editable="{true}" on:input="{try_save_recipe}"/>
+        </div>
         <hr>
         <div>
             <div class="flex justify-around flex-wrap">
