@@ -20,3 +20,12 @@
         {/if}
     {/if}
 </div>
+
+<style>
+    .input:disabled, .input[disabled] {
+        cursor: text;
+    }
+    .input-sm {
+        height: 1.5rem
+    }
+</style>

@@ -90,6 +90,14 @@ export class Recipe {
     tags: string[] = []
     pics?: any
     pic_urls: string[] = []
+    serving_size = ""
+    calories?: number
+    fat?: number
+    carbs?: number
+    protein?: number
+    fiber?: number
+    sugar?: number
+    sodium?: number
     created: number = Date.now()
     last_updated: number = Date.now()
 
