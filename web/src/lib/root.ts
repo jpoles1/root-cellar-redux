@@ -150,18 +150,31 @@ export const recipe_from_google_recipe = (google_recipe: GoogleRecipeSchema): Re
         const instructions = Array.isArray(raw_instruct) ? raw_instruct.map((instruction: any) => instruction.text || "").join('\n') : typeof raw_instruct === 'string' ? raw_instruct : ''
         return instructions
     }
+    const extract_tags = () => {
+        if(!google_recipe.keywords) return []
+        const tags = google_recipe.keywords && google_recipe.keywords.split ? google_recipe.keywords.split(',').map((x: string) => x.trim().toLowerCase()) || [] : google_recipe.keywords.map((x: string) => x.toLowerCase()) || []
+        return tags
+    } 
     return new Recipe({
         title: google_recipe.name.replace(/recipe[,:\s]*/i, "").trim() || "Unnamed Recipe",
         description: google_recipe.description || "",
         ingredients: txt_to_ingredients(extract_ingredients()),
         instructions: txt_to_instructions(extract_instructions()),
         servings: parseInt(google_recipe.recipeYield) || 0,
+        calories: parseInt(google_recipe.nutrition.calories) || 0,
+        carbs: parseInt(google_recipe.nutrition.carbohydrateContent) || 0,
+        fat: parseInt(google_recipe.nutrition.fatContent) || 0,
+        fiber: parseInt(google_recipe.nutrition.fiberContent) || 0,
+        protein: parseInt(google_recipe.nutrition.proteinContent) || 0,
+        sugar: parseInt(google_recipe.nutrition.sugarContent) || 0,
+        sodium: parseInt(google_recipe.nutrition.sodiumContent) || 0,
+        serving_size: google_recipe.nutrition.servingSize || "",
         //active_time: google_recipe.cookTime || 0,
         //total_time: google_recipe.totalTime || 0,
         archived: false,
         public: true,
         version: 1,
-        tags: google_recipe.keywords && google_recipe.keywords.split ? google_recipe.keywords.split(',').map((x: string) => x.trim().toLowerCase()) || [] : google_recipe.keywords.map((x: string) => x.toLowerCase()) || [], 
-        pic_urls: extract_img_url()
+        tags: extract_tags(),
+        pic_urls: extract_img_url().slice(0, 2),
     })
 }

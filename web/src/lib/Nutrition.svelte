@@ -52,7 +52,7 @@
           </th>
           <td>
             Cal from Fat
-            {(recipe.fat || 0) * 9}
+            {((recipe.fat || 0) * 9).toFixed(1)}
           </td>
         </tr>
         <tr class="thick-row">

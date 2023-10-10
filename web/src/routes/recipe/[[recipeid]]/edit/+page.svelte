@@ -14,6 +14,7 @@
 	import { page } from "$app/stores";
 	import TagEditor from "$lib/TagEditor.svelte";
 	import Nutrition from "$lib/Nutrition.svelte";
+	import NutritionCalc from "$lib/NutritionCalc.svelte";
 
     export let data;
     let recipeid = data.recipeid;
@@ -25,6 +26,8 @@
 
     let show_raw_instructions = !(recipeid && recipeid != "") || raweditor;
     let raw_instructions = "";
+
+    let show_nutr_calc = false;
 
     const toggle_raw_ingredients = () => {
         if (!show_raw_ingredients) {
@@ -177,7 +180,6 @@
             <TagEditor bind:recipe="{recipe}" on:save="{try_save_recipe}" class="z-1000"/>
         </div>
         <div class="flex justify-center space-x-8 m-5">
-            <NumInput placeholder="# of Servings" bind:value="{recipe.servings}" on:input="{try_save_recipe}" class="w-24" noarrows alwaysfloatplaceholder />
             <NumInput placeholder="Active Time" bind:value="{recipe.active_time}" on:input="{try_save_recipe}" class="w-24" noarrows alwaysfloatplaceholder />
             <NumInput placeholder="Total Time" bind:value="{recipe.total_time}" on:input="{try_save_recipe}" class="w-24" noarrows alwaysfloatplaceholder />
         </div>
@@ -218,8 +220,20 @@
         <hr>
         <RecipeToolbar recipe="{recipe}" editing/>
         <hr>
-        <div class="flex justify-center">
-            <Nutrition recipe="{recipe}" editable="{true}" on:input="{try_save_recipe}"/>
+        <div class="flex justify-center flex-wrap">
+            <div class="flex flex-col">
+                <Nutrition recipe="{recipe}" editable="{true}" on:input="{try_save_recipe}"/>
+                <div class="italic text-center">
+                    Note: all nutrition data is estimated.
+                    <br>
+                    <a class="link" on:click="{() => {show_nutr_calc = !show_nutr_calc}}">Click to {show_nutr_calc ? "hide" : "show"} nutrition calculator (beta)</a>
+                </div>
+            </div>
+            {#if show_nutr_calc}
+                <div class="bg-base-300 p-4 rounded-lg overflow-auto max-w-[100vw] ">
+                    <NutritionCalc bind:recipe="{recipe}"/>
+                </div>
+            {/if}
         </div>
         <hr>
         <div>
