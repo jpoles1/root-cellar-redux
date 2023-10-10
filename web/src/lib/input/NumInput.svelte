@@ -1,6 +1,7 @@
 <script lang="ts">
     export let placeholder: string;
     export let value: number = 0;
+    export let step: number = 1;
     export let disabled: boolean = false;
     export let noarrows: boolean = false;
     export let nofloatplaceholder: boolean = false;
@@ -8,7 +9,7 @@
 </script>
 
 <div class="form-control relative {$$props.class || ''}">
-    <input type="number" placeholder="{placeholder || ''}" disabled="{disabled}" bind:value="{value}" class="input input-sm {nofloatplaceholder ? '' : 'placeholder-transparent'} {noarrows ? 'nonumarrow' : ''} peer" on:input on:change on:keydown on:keyup>
+    <input type="number" placeholder="{placeholder || ''}" disabled="{disabled}" bind:value="{value}" class="input input-sm {nofloatplaceholder ? '' : 'placeholder-transparent'} {noarrows ? 'nonumarrow' : ''} peer" step="{step}" on:input on:change on:keydown on:keyup>
     {#if !nofloatplaceholder}
         {#if alwaysfloatplaceholder}
             <label class="label absolute left-4 pointer-events-none transition-all text-base-content text-opacity-50 -top-7 text-xs text-sm bg-transparent">
