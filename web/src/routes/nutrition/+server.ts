@@ -11,7 +11,7 @@ export async function POST({ request, cookies }) {
 		clean_ingredient = clean_ingredient.split(/ or /i)[0]
 		//Remove all non-alphabetical characters
 		clean_ingredient = clean_ingredient.replaceAll(/[^a-zA-Z ]/g, '');
-		return nutritiondb().prepare(`
+		return nutritiondb.prepare(`
 			SELECT DISTINCT * FROM (SELECT DISTINCT * FROM food_search WHERE food_search MATCH '${clean_ingredient} raw OR ${clean_ingredient}' AND calories IS NOT NULL ORDER BY rank LIMIT 50) GROUP BY description, brand_name, brand_owner ORDER BY brand_name IS NOT NULL, brand_owner IS NOT NULL, length(description) LIMIT 50
 		`).all();
 	})

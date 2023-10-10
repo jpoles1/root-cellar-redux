@@ -1,9 +1,9 @@
-FROM oven/bun:1.0
+FROM node
 
 # install dependencies
 WORKDIR /app
-COPY package.json bun.lockb ./
-RUN bun i
+COPY package.json package-lock.json ./
+RUN npm install
 
 COPY . .
 
