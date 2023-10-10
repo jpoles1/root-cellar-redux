@@ -14,6 +14,7 @@
 	import { page } from "$app/stores";
 	import TagEditor from "$lib/TagEditor.svelte";
 	import Nutrition from "$lib/Nutrition.svelte";
+	import NutritionCalc from "$lib/NutritionCalc.svelte";
 
     export let data;
     let recipeid = data.recipeid;
@@ -220,6 +221,7 @@
         <hr>
         <div class="flex justify-center">
             <Nutrition recipe="{recipe}" editable="{true}" on:input="{try_save_recipe}"/>
+            <NutritionCalc recipe="{recipe}" />
         </div>
         <hr>
         <div>
