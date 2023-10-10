@@ -3,6 +3,7 @@ version: "3"
 services:
   pb:
     container_name: root-cellar-pb
+    restart: always
     build: pb
     ports:
       - 4006:8090
