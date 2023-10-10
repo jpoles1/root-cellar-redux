@@ -221,7 +221,7 @@
         <hr>
         <div class="flex justify-center">
             <Nutrition recipe="{recipe}" editable="{true}" on:input="{try_save_recipe}"/>
-            <NutritionCalc recipe="{recipe}" />
+            <NutritionCalc bind:recipe="{recipe}" />
         </div>
         <hr>
         <div>

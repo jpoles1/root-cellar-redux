@@ -6,13 +6,9 @@ import type { Ingredient } from '$lib/root.js';
 export async function POST({ request, cookies }) {
 	const { ingredients } = await request.json();
 	const nutrition = ingredients.map((ingredient: Ingredient) => {
-		return nutritiondb().prepare(
-			`SELECT * FROM usda_branded_column RIGHT JOIN 
-			(SELECT fdc_id FROM food_search WHERE description MATCH '${ingredient.ingredient}' ORDER BY rank LIMIT 15) as matches 
-			ON usda_branded_column.fdc_id = matches.fdc_id 
-			WHERE protein_amount IS NOT NULL AND carb_amount IS NOT NULL AND fat_amount IS NOT NULL AND energy_amount IS NOT NULL
-			ORDER BY length(description) 
-			LIMIT 10
+		const clean_ingredient = ingredient.ingredient.replaceAll(/\(.*\)/g, '');
+		return nutritiondb().prepare(`
+			SELECT DISTINCT * FROM (SELECT DISTINCT * FROM food_search WHERE food_search MATCH '${clean_ingredient} raw OR ${clean_ingredient}' ORDER BY rank LIMIT 50) GROUP BY description, brand_name, brand_owner ORDER BY length(brand_name), length(brand_owner), length(description) LIMIT 50
 		`).all();
 	})
 	const userid = cookies.get('userid');
