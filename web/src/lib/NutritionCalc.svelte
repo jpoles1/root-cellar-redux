@@ -11,29 +11,44 @@
     let nutr_sel: number[] = [];
     let serving_mult: number[] = [];
     let enable_serving_metric_to_imperial = true;
-    let enable_serving_ml_to_kitchen = false;
+    let enable_serving_ml_to_kitchen = true;
+    let custom_nutr = {
+        calories: 0,
+        fat: 0,
+        carbs: 0,
+        protein: 0,
+        sugar: 0,
+        fiber: 0,
+        sodium: 0
+    }
 
-    const recalculate_nutrition = () => {
+    $: recalculate_nutrition = () => {
         const calc_nutr = nutr
             .map((_, i) => nutr[i][nutr_sel[i]])
+            .concat([custom_nutr])
             .reduce(
-                (a, b) => {
+                (a, b, i) => {
                     return {
-                        energy_amount: (a.energy_amount || 0) + (b?.energy_amount || 0),
-                        fat_amount: (a.fat_amount || 0) + (b?.fat_amount || 0),
-                        fat_unit: a.fat_unit || b?.fat_unit,
-                        carb_amount: (a.carb_amount || 0) + (b?.carb_amount || 0),
-                        carb_unit: a.carb_unit || b?.carb_unit,
-                        protein_amount: (a.protein_amount || 0) + (b?.protein_amount || 0),
-                        protein_unit: a.protein_unit || b?.protein_unit,
+                        calories: (a.calories || 0) + (b?.calories || 0)  * (serving_mult[i] || 1),
+                        fat: (a.fat || 0) + (b?.fat || 0) * (serving_mult[i] || 1),
+                        carbs: (a.carbs || 0) + (b?.carbs || 0) * (serving_mult[i] || 1),
+                        protein: (a.protein || 0) + (b?.protein || 0) * (serving_mult[i] || 1),
+                        sugar: (a.sugar || 0) + (b?.sugar || 0) * (serving_mult[i] || 1),
+                        fiber: (a.fiber || 0) + (b?.fiber || 0) * (serving_mult[i] || 1),
+                        sodium: (a.sodium || 0) + (b?.sodium || 0) * (serving_mult[i] || 1),
+
                     };
                 },
                 {}
             );
-        recipe.calories = calc_nutr.energy_amount;
-        recipe.fat = calc_nutr.fat_amount;
-        recipe.carbs = calc_nutr.carb_amount;
-        recipe.protein = calc_nutr.protein_amount;
+        console.log(calc_nutr)
+        recipe.calories = Math.round(calc_nutr.calories / (recipe.servings || 1));
+        recipe.fat = Math.round(calc_nutr.fat / (recipe.servings || 1));
+        recipe.carbs = Math.round(calc_nutr.carbs / (recipe.servings || 1));
+        recipe.protein = Math.round(calc_nutr.protein / (recipe.servings || 1));
+        recipe.sugar = Math.round(calc_nutr.sugar / (recipe.servings || 1));
+        recipe.fiber = Math.round(calc_nutr.fiber / (recipe.servings || 1));
+        recipe.sodium = Math.round(calc_nutr.sodium / (recipe.servings || 1));
     };
 
     $: nlook = (i: number) => {
@@ -63,7 +78,7 @@
             }
         }
         
-        return `${serving_size || "?"}${nlook(i).serving_size_unit ? ' ' + nlook(i).serving_size_unit : ""}`
+        return `${serving_size || ""}${nlook(i).serving_size_unit ? ' ' + nlook(i).serving_size_unit : ""}`
     }
 
     let regen_nutrition = (i: number, new_name: string) => {
@@ -104,7 +119,7 @@
 </script>
 <div class="flex flex-col">
     <h1>Nutrition Calculator</h1>
-    <div class="flex flex-row space-x-10">
+    <div class="flex flex-row space-x-10 mb-2">
         <div class="flex flex-row items-center space-x-2">
             <span>Metric</span> <input type="checkbox" class="toggle" bind:checked="{enable_serving_metric_to_imperial}" /> <span>Imperial</span>
         </div>
@@ -112,55 +127,87 @@
             <span>mL</span> <input type="checkbox" class="toggle" bind:checked="{enable_serving_ml_to_kitchen}" /> <span>Kitchen</span>
         </div>
     </div>
-    <table class="table">
-        <tr>
-            <th>Ingredient</th>
-            <th>Matches</th>
-            <th>Serving Size</th>
-            <th>Serving Mult</th>
-            <th>Calories</th>
-            <th>Fat</th>
-            <th>Carbs</th>
-            <th>Protein</th>
-            <th>Fiber</th>
-        </tr>
-        {#if nutr.length > 0}
-            {#each recipe.ingredients as ingredient, i}
+    <table class="table table-auto">
+        <thead>
+            <tr>
+                <th>Ingredient</th>
+                <th>Matches</th>
+                <th>Serving Size</th>
+                <th>Serving Mult</th>
+                <th>Calories</th>
+                <th>Fat</th>
+                <th>Protein</th>
+                <th>Carbs</th>
+                <th>Fiber</th>
+                <th>Sugar</th>
+                <th>Sodium</th>
+            </tr>
+        </thead>
+        <tbody>
+            {#if nutr && nutr.length > 0}
+                {#each recipe.ingredients as ingredient, i}
+                    <tr class="hover">
+                        <td class="pt-4">
+                            <div class="flex flex-row align-bottom">
+                                <div class="whitespace-nowrap">{ingredient.quantity}{ingredient.unit ? ` ${ingredient.unit}` : ""} of&nbsp;&nbsp;</div><TextInput bind:value="{sub_ingred[i]}" placeholder="{ingredient.ingredient}" on:change="{(e) => try_regen_nutrition(i, e.target.value)}"/>
+                            </div>
+                        </td>
+                        <td>
+                            <select class="max-w-[300px]" bind:value={nutr_sel[i]} >
+                                {#each nutr[i] as ing_opt, j}
+                                    <option value="{j}">{ing_opt.description} {(ing_opt.brand_name || ing_opt.brand_owner) ? `- ${ing_opt.brand_name || ing_opt.brand_owner}` : ""}</option> 
+                                {/each}
+                            </select>
+                        </td>
+                        <td>
+                            {calc_serving_size(i)}
+                        </td>
+                        <td>
+                            <NumInput bind:value={serving_mult[i]} class="w-[80px] border" placeholder="" step="{0.25}" />
+                        </td>
+                        <td>
+                            {nlook(i).calories ? (nlook(i).calories * (serving_mult[i] || 1)).toFixed(0) : "?"}
+                        </td>
+                        <td>
+                            {nlook(i).fat ? (nlook(i).fat * (serving_mult[i] || 1)).toFixed(0) : "? "}g
+                        </td>
+                        <td>
+                            {nlook(i).protein ? (nlook(i).protein * (serving_mult[i] || 1)).toFixed(0) : "? "}g
+                        </td>
+                        <td>
+                            {nlook(i).carbs ? (nlook(i).carbs * (serving_mult[i] || 1)).toFixed(0) : "? "}g
+                        </td>
+                        <td>
+                            {nlook(i).fiber ? (nlook(i).fiber * (serving_mult[i] || 1)).toFixed(0) : "? "}g
+                        </td>
+                        <td>
+                            {nlook(i).sugar ? (nlook(i).fiber * (serving_mult[i] || 1)).toFixed(0) : "? "}g
+                        </td>
+                        <td>
+                            {nlook(i).sodium ? (nlook(i).sodium * (serving_mult[i] || 1)).toFixed(0) : "? "}mg
+                        </td>
+                    </tr>
+                {/each}
                 <tr>
-                    <td class="flex flex-row">
-                        <div>{ingredient.quantity}{ingredient.unit ? ` ${ingredient.unit}` : ""} of </div><TextInput bind:value="{sub_ingred[i]}" placeholder="{ingredient.ingredient}" on:change="{(e) => try_regen_nutrition(i, e.target.value)}"/>
-                    </td>
+                    <td>Custom Nutrition:</td>
+                    <td class="italic">(Optional)</td>
+                    <td></td>
+                    <td></td>
+                    {#each ["calories", "fat", "protein", "carbs", "fiber", "sugar", "sodium"] as nutr_type}
                     <td>
-                        <select class="max-w-[350px]" bind:value={nutr_sel[i]} >
-                            {#each nutr[i] as ing_opt, j}
-                                <option value="{j}">{ing_opt.description} {(ing_opt.brand_name || ing_opt.brand_owner) ? `- ${ing_opt.brand_name || ing_opt.brand_owner}` : ""}</option> 
-                            {/each}
-                        </select>
+                        <NumInput bind:value={custom_nutr[nutr_type]} class="w-[80px] border" placeholder="" step="{1}" />
                     </td>
-                    <td>
-                        {calc_serving_size(i)}
-                    </td>
-                    <td>
-                        <NumInput bind:value={serving_mult[i]} class="w-[80px] border" placeholder="" step="{0.25}" />
-                    </td>
-                    <td>
-                        {nlook(i).energy_amount ? (nlook(i).energy_amount * serving_mult[i]).toFixed(0) : "?"}
-                    </td>
-                    <td>
-                        {nlook(i).fat_amount ? (nlook(i).energy_amount * serving_mult[i]).toFixed(0) : "?"} {nlook(i).fat_unit || ""}
-                    </td>
-                    <td>
-                        {nlook(i).carb_amount ? (nlook(i).carb_amount * serving_mult[i]).toFixed(0) : "?"} {nlook(i).carb_unit || ""}
-                    </td>
-                    <td>
-                        {nlook(i).protein_amount ? (nlook(i).protein_amount * serving_mult[i]).toFixed(0) : "?"} {nlook(i).protein_unit || ""}
-                    </td>
-                    <td>
-                        {nlook(i).fiber_amount ? (nlook(i).fiber_amount * serving_mult[i]).toFixed(0) : "?"} {nlook(i).fiber_unit || ""}
-                    </td>
+                    {/each}
                 </tr>
-            {/each}
-            <button class="btn btn-primary" on:click={recalculate_nutrition}>Recalculate Nutrition</button>
-        {/if}
+                <button class="btn btn-primary mt-2" on:click={recalculate_nutrition}>Recalculate Nutrition</button>
+            {/if}
+        </tbody>
     </table>
 </div>
+
+<style>
+    td, th {
+        text-align: center;
+        border: 1px solid #222;
+    }
+</style>

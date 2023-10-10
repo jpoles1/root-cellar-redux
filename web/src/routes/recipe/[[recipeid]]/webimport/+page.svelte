@@ -34,7 +34,7 @@
             const new_recipe = await pb.collection("recipes").create(recipe)
             goto(`/recipe/${new_recipe.id}/edit`)
         }).catch((e) => {
-            console.log(`Import failed: ${e}`)
+            console.log(`Import failed:`, e)
             toast.push(`Import failed: ${e}`)
             failure_count++
         }).finally(() => {

@@ -150,6 +150,11 @@ export const recipe_from_google_recipe = (google_recipe: GoogleRecipeSchema): Re
         const instructions = Array.isArray(raw_instruct) ? raw_instruct.map((instruction: any) => instruction.text || "").join('\n') : typeof raw_instruct === 'string' ? raw_instruct : ''
         return instructions
     }
+    const extract_tags = () => {
+        if(!google_recipe.keywords) return []
+        const tags = google_recipe.keywords && google_recipe.keywords.split ? google_recipe.keywords.split(',').map((x: string) => x.trim().toLowerCase()) || [] : google_recipe.keywords.map((x: string) => x.toLowerCase()) || []
+        return tags
+    } 
     return new Recipe({
         title: google_recipe.name.replace(/recipe[,:\s]*/i, "").trim() || "Unnamed Recipe",
         description: google_recipe.description || "",
@@ -169,7 +174,7 @@ export const recipe_from_google_recipe = (google_recipe: GoogleRecipeSchema): Re
         archived: false,
         public: true,
         version: 1,
-        tags: google_recipe.keywords && google_recipe.keywords.split ? google_recipe.keywords.split(',').map((x: string) => x.trim().toLowerCase()) || [] : google_recipe.keywords.map((x: string) => x.toLowerCase()) || [], 
-        pic_urls: extract_img_url()
+        tags: extract_tags(),
+        pic_urls: extract_img_url().slice(0, 2),
     })
 }
