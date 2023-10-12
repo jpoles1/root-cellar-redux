@@ -6,6 +6,7 @@
     import {debounce} from "$lib/debounce"
 
     export let recipe: Recipe;
+    let ingredients_mirror: Ingredient[] = recipe.ingredients
     let sub_ingred: string[] = [];
     let nutr: any[] = [];
     let nutr_sel: number[] = [];
@@ -22,6 +23,13 @@
         sodium: 0
     }
 
+    $: {
+        ingredients_mirror = JSON.parse(JSON.stringify(recipe.ingredients))
+        if (recipe.ingredients.length > 0) {
+            try_regen_nutrition()
+        }
+    }
+
     $: recalculate_nutrition = () => {
         const calc_nutr = nutr
             .map((_, i) => nutr[i][nutr_sel[i]])
@@ -29,13 +37,13 @@
             .reduce(
                 (a, b, i) => {
                     return {
-                        calories: (a.calories || 0) + (b?.calories || 0)  * (serving_mult[i] || 1),
-                        fat: (a.fat || 0) + (b?.fat || 0) * (serving_mult[i] || 1),
-                        carbs: (a.carbs || 0) + (b?.carbs || 0) * (serving_mult[i] || 1),
-                        protein: (a.protein || 0) + (b?.protein || 0) * (serving_mult[i] || 1),
-                        sugar: (a.sugar || 0) + (b?.sugar || 0) * (serving_mult[i] || 1),
-                        fiber: (a.fiber || 0) + (b?.fiber || 0) * (serving_mult[i] || 1),
-                        sodium: (a.sodium || 0) + (b?.sodium || 0) * (serving_mult[i] || 1),
+                        calories: (a.calories || 0) + (b?.calories || 0)  * (serving_mult[i] != undefined ? serving_mult[i] : 1),
+                        fat: (a.fat || 0) + (b?.fat || 0) * (serving_mult[i] != undefined ? serving_mult[i] : 1),
+                        carbs: (a.carbs || 0) + (b?.carbs || 0) * (serving_mult[i] != undefined ? serving_mult[i] : 1),
+                        protein: (a.protein || 0) + (b?.protein || 0) * (serving_mult[i] != undefined ? serving_mult[i] : 1),
+                        sugar: (a.sugar || 0) + (b?.sugar || 0) * (serving_mult[i] != undefined ? serving_mult[i] : 1),
+                        fiber: (a.fiber || 0) + (b?.fiber || 0) * (serving_mult[i] != undefined ? serving_mult[i] : 1),
+                        sodium: (a.sodium || 0) + (b?.sodium || 0) * (serving_mult[i] != undefined ? serving_mult[i] : 1),
 
                     };
                 },
@@ -52,7 +60,7 @@
     };
 
     $: nlook = (i: number) => {
-        return nutr[i][nutr_sel[i]] || {}
+        return nutr[i] ? nutr[i][nutr_sel[i]] || {} : {}
     }
 
     $: calc_serving_size = (i: number) => {
@@ -81,7 +89,7 @@
         return `${serving_size || ""}${nlook(i).serving_size_unit ? ' ' + nlook(i).serving_size_unit : ""}`
     }
 
-    let regen_nutrition = (i: number, new_name: string) => {
+    let regen_single_nutrition = (i: number, new_name: string) => {
         // Replaces the nutrition entry at i with a newly entered ingredient name
         fetch("/nutrition", {
             method: "POST",
@@ -94,15 +102,14 @@
             nutr[i] = data.nutrition[0]
             nutr_sel[i] = 0
         })
-
     }
 
-    let regen_nutrition_debounce = debounce(regen_nutrition, 1500, 500)
-    const try_regen_nutrition = (i: number, new_name: string) => {
-        regen_nutrition_debounce(i, new_name)
+    let regen_single_nutrition_debounce = debounce(regen_single_nutrition, 1500, 500)
+    const try_regen_single_nutrition = (i: number, new_name: string) => {
+        regen_single_nutrition_debounce(i, new_name)
     }
 
-    onMount(async () => {
+    let regen_nutrition = async () => {
         let resp_data = await fetch("/nutrition", {
             method: "POST",
             headers: {
@@ -110,11 +117,20 @@
             },
             body: JSON.stringify({ingredients: recipe.ingredients})
         }).then(res => res.json());
-        nutr = resp_data.nutrition
+        nutr = resp_data.nutrition || []
         nutr_sel = recipe.ingredients.map(() => 0)
         serving_mult = recipe.ingredients.map(() => 1)
         sub_ingred = recipe.ingredients.map((ingred: Ingredient) => ingred.ingredient)
         console.log(nutr)
+    }
+
+    let regen_nutrition_debounce = debounce(regen_nutrition, 1500, 500)
+    const try_regen_nutrition = () => {
+        regen_nutrition_debounce()
+    }
+
+    onMount(async () => {
+        regen_nutrition()
     });
 </script>
 <div class="flex flex-col">
@@ -145,46 +161,52 @@
         </thead>
         <tbody>
             {#if nutr && nutr.length > 0}
-                {#each recipe.ingredients as ingredient, i}
+                {#each ingredients_mirror as ingredient, i}
                     <tr class="hover">
                         <td class="pt-4">
                             <div class="flex flex-row align-bottom">
-                                <div class="whitespace-nowrap">{ingredient.quantity}{ingredient.unit ? ` ${ingredient.unit}` : ""} of&nbsp;&nbsp;</div><TextInput bind:value="{sub_ingred[i]}" placeholder="{ingredient.ingredient}" on:change="{(e) => try_regen_nutrition(i, e.target.value)}"/>
+                                <div class="whitespace-nowrap">{ingredient.quantity}{ingredient.unit ? ` ${ingredient.unit}` : ""} of&nbsp;&nbsp;</div><TextInput bind:value="{sub_ingred[i]}" placeholder="{ingredient.ingredient}" on:input="{(e) => try_regen_single_nutrition(i, e.target.value)}"/>
                             </div>
                         </td>
                         <td>
                             <select class="max-w-[300px]" bind:value={nutr_sel[i]} >
-                                {#each nutr[i] as ing_opt, j}
-                                    <option value="{j}">{ing_opt.description} {(ing_opt.brand_name || ing_opt.brand_owner) ? `- ${ing_opt.brand_name || ing_opt.brand_owner}` : ""}</option> 
-                                {/each}
+                                {#if nutr[i] && nutr[i].length > 0}
+                                    {#each nutr[i] as ing_opt, j}
+                                        <option value="{j}">{ing_opt.description} {(ing_opt.brand) ? `- ${ing_opt.brand}` : ""}</option> 
+                                    {/each}
+                                {/if}
                             </select>
                         </td>
                         <td>
                             {calc_serving_size(i)}
+                            {#if calc_serving_size(i).replaceAll(/\d+(:?[\./]\d+)?/g, "").trim() != ingredient.unit}
+                                <br>
+                                <a class="link" href="https://www.google.com/search?q={encodeURIComponent(`${calc_serving_size(i)} ${ingredient.ingredient} to ${ingredient.unit}`)}" target="_blank" style="font-size: 70%">Conversion</a>
+                            {/if}
                         </td>
                         <td>
                             <NumInput bind:value={serving_mult[i]} class="w-[80px] border" placeholder="" step="{0.25}" />
                         </td>
                         <td>
-                            {nlook(i).calories ? (nlook(i).calories * (serving_mult[i] || 1)).toFixed(0) : "?"}
+                            {nlook(i).calories != undefined ? (nlook(i).calories * (serving_mult[i] != undefined ? serving_mult[i] : 1)).toFixed(0) : "?"}
                         </td>
                         <td>
-                            {nlook(i).fat ? (nlook(i).fat * (serving_mult[i] || 1)).toFixed(0) : "? "}g
+                            {nlook(i).fat != undefined ? (nlook(i).fat * (serving_mult[i] != undefined ? serving_mult[i] : 1)).toFixed(0) : "? "}g
                         </td>
                         <td>
-                            {nlook(i).protein ? (nlook(i).protein * (serving_mult[i] || 1)).toFixed(0) : "? "}g
+                            {nlook(i).protein != undefined ? (nlook(i).protein * (serving_mult[i] != undefined ? serving_mult[i] : 1)).toFixed(0) : "? "}g
                         </td>
                         <td>
-                            {nlook(i).carbs ? (nlook(i).carbs * (serving_mult[i] || 1)).toFixed(0) : "? "}g
+                            {nlook(i).carbs != undefined ? (nlook(i).carbs * (serving_mult[i] != undefined ? serving_mult[i] : 1)).toFixed(0) : "? "}g
                         </td>
                         <td>
-                            {nlook(i).fiber ? (nlook(i).fiber * (serving_mult[i] || 1)).toFixed(0) : "? "}g
+                            {nlook(i).fiber != undefined ? (nlook(i).fiber * (serving_mult[i] != undefined ? serving_mult[i] : 1)).toFixed(0) : "? "}g
                         </td>
                         <td>
-                            {nlook(i).sugar ? (nlook(i).fiber * (serving_mult[i] || 1)).toFixed(0) : "? "}g
+                            {nlook(i).sugar != undefined ? (nlook(i).sugar * (serving_mult[i] != undefined ? serving_mult[i] : 1)).toFixed(0) : "? "}g
                         </td>
                         <td>
-                            {nlook(i).sodium ? (nlook(i).sodium * (serving_mult[i] || 1)).toFixed(0) : "? "}mg
+                            {nlook(i).sodium != undefined ? (nlook(i).sodium * (serving_mult[i] != undefined ? serving_mult[i] : 1)).toFixed(0) : "? "}mg
                         </td>
                     </tr>
                 {/each}
@@ -195,7 +217,7 @@
                     <td></td>
                     {#each ["calories", "fat", "protein", "carbs", "fiber", "sugar", "sodium"] as nutr_type}
                     <td>
-                        <NumInput bind:value={custom_nutr[nutr_type]} class="w-[80px] border" placeholder="" step="{1}" />
+                        <NumInput bind:value={custom_nutr[nutr_type]} class="w-[65px] border" placeholder="" step="{1}" />
                     </td>
                     {/each}
                 </tr>
@@ -209,5 +231,6 @@
     td, th {
         text-align: center;
         border: 1px solid #222;
+        padding: 8px;
     }
 </style>

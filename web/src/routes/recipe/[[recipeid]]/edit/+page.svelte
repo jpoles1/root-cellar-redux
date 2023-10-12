@@ -81,7 +81,7 @@
         }
         toast.push("Saved Recipe!", {classes: ["success"]})
     }
-    let save_debounce = debounce(save_recipe, recipeid && recipeid != "" ? 5000 : 2000, 0)
+    let save_debounce = debounce(save_recipe, recipeid && recipeid != "" ? 2500 : 1500, 0)
     const try_save_recipe = () => {
         save_debounce()
     }
