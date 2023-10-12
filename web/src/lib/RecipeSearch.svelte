@@ -6,6 +6,7 @@
 	import { goto } from "$app/navigation";
 	import type { Recipe } from "./root";
 	import { page } from "$app/stores";
+	import Nutrition from "$lib/Nutrition.svelte";
 
     let recipes: Recipe[] = []
     let search_query = $page.url.searchParams.get("query") || "";
@@ -13,6 +14,8 @@
     let filter_my_recipes = $page.url.searchParams.get("my_recipes") == "true";
     let filter_private_recipes = $page.url.searchParams.get("private_recipes") == "true";
     let searching = false;
+
+    let active_nutr_fact: Recipe | undefined = undefined;
     
     const search_recipes = async () => {
         searching = true
@@ -86,8 +89,12 @@
                             <span>User: <a class="link" href="/user/{recipe.uid}">{recipe.expand.uid ? `${recipe.expand.uid.username}#` : '' }{(recipe.uid || '').slice(0, 8)}</a></span>
                             <span><a class="link" href="/user/{recipe.uid}">{recipe.expand.uid ? recipe.expand.uid.email || '' : ''}</a></span>
                         {/if}
-                        {#if recipe.servings}
-                            <i>Servings: {recipe.servings}</i>
+                        {#if recipe.serving_size || recipe.calories || recipe.protein || recipe.fat || recipe.carbs}
+                            <div class="mt-1">
+                                <a class="btn btn-xs nutr-hover-trigger" on:mousedown={() => {active_nutr_fact = recipe; nutr_modal.showModal()}} on:touchstart={() => {active_nutr_fact = recipe; nutr_modal.showModal()}} >
+                                    Nutrition Facts
+                                </a>
+                        </div>
                         {/if}
                     </div>
                     <div class="card-actions justify-end">
@@ -116,5 +123,15 @@
         {#if recipes.length == 0} 
             <h1>Sorry, no recipes found...</h1>
         {/if}
+        <dialog id="nutr_modal" class="modal"  on:mouseup={() => {active_nutr_fact = undefined; nutr_modal.close()}} on:touchend={() => {active_nutr_fact = undefined; nutr_modal.close()}}>
+            <div class="modal-box">
+                {#if active_nutr_fact}
+                    <Nutrition recipe="{active_nutr_fact}"/>
+                {/if}
+            </div>
+            <form method="dialog" class="modal-backdrop">
+                <button>close</button>
+            </form>            
+        </dialog>
     </div>
 </div>
