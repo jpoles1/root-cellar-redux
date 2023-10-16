@@ -1,3 +1,7 @@
-import sqlite from 'better-sqlite3'
+import Database from 'better-sqlite3'
 
-export const nutritiondb = new sqlite('./nutritiondb/CompFoodSearch.sqlite')
+export const nutritiondb = () => { 
+    const db = new Database('./nutritiondb/CompFoodSearch.sqlite')
+    db.pragma('journal_mode = WAL')
+    return db
+}

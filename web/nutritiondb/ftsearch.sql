@@ -48,3 +48,15 @@ INSERT INTO food_search (
     serving_size as serving_size_unit,
     calories, protein, carbs, fat, fiber, sodium, sugar
 FROM canfood;
+
+INSERT INTO food_search (
+    fdc_id, 
+    description,
+    serving_size, serving_size_unit,
+    calories, protein, carbs, fat, fiber, sodium, sugar
+) SELECT
+    FoodID as fdc_id,
+    description,
+    serving_size, serving_size_unit,
+    calories, protein, carbs, fat, fiber, sodium, sugar
+FROM customfood;

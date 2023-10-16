@@ -146,7 +146,11 @@
     <table class="table table-auto">
         <thead>
             <tr>
-                <th>Ingredient</th>
+                <th>
+                    <div class="tooltip" data-tip="Edit below to refine your nutrition search without changing the recipe ingredients">
+                        Ingredient
+                    </div>
+                </th>
                 <th>Matches</th>
                 <th>Serving Size</th>
                 <th>Serving Mult</th>
@@ -232,5 +236,11 @@
         text-align: center;
         border: 1px solid #222;
         padding: 8px;
+    }
+    .tooltip::before {
+        white-space: break-spaces;
+        font-size: 85%;
+        line-height: 120%;
+        max-width: 200px;
     }
 </style>
