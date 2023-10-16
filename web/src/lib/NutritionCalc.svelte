@@ -169,7 +169,7 @@
                     <tr class="hover">
                         <td class="pt-4">
                             <div class="flex flex-row align-bottom">
-                                <div class="whitespace-nowrap">{ingredient.quantity}{ingredient.unit ? ` ${ingredient.unit}` : ""} of&nbsp;&nbsp;</div><TextInput bind:value="{sub_ingred[i]}" placeholder="{ingredient.ingredient}" on:input="{(e) => try_regen_single_nutrition(i, e.target.value)}"/>
+                                <div class="whitespace-nowrap">{ingredient.quantity}{ingredient.unit ? ` ${ingredient.unit}` : ""} of&nbsp;&nbsp;</div><TextInput bind:value="{sub_ingred[i]}" placeholder="{ingredient.ingredient.slice(0,25) + (ingredient.ingredient.length > 25 ? "..." : "")}" on:input="{(e) => try_regen_single_nutrition(i, e.target.value)}"/>
                             </div>
                         </td>
                         <td>
