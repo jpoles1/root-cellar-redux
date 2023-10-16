@@ -13,6 +13,6 @@ WORKDIR /app
 COPY --from=0 /app .
 COPY . .
 
-COPY docker.env .env
+COPY .env .env
 
 #RUN bun run build
