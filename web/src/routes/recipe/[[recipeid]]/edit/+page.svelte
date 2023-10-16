@@ -167,6 +167,9 @@
 </script>
 
 <svelte:window on:beforeunload={save_recipe} />
+<svelte:head>
+    <title>{recipe && recipe.title ? `${recipe.title} - ` : ""}Root Cellar</title> 
+</svelte:head>
 
 <div> 
     {#if recipe}

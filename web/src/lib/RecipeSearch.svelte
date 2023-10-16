@@ -49,6 +49,10 @@
     })
 </script>
 
+<svelte:head>
+    <title>Recipe Search - Root Cellar</title> 
+</svelte:head>
+
 <div class="max-h-full flex flex-col">
     <div class="flex max-md:flex-col flex-row justify-center text-right">
         <div class="flex-grow mx-auto"> 

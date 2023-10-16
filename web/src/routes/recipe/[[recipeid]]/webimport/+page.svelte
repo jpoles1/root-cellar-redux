@@ -48,6 +48,10 @@
     }
 </script>
 
+<svelte:head>
+    <title>Recipe Import - Root Cellar</title> 
+</svelte:head>
+
 <div class="flex items-center flex-col space-y-5">
     <h1>URL Import:</h1>
     <div class="w-full flex justify-center">

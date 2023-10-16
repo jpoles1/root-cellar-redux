@@ -2,7 +2,9 @@
     import { pb, uaccount } from "$lib/pocketbase";
 	import Icon from '@iconify/svelte';
 </script>
-
+<svelte:head>
+    <title>Root Cellar</title> 
+</svelte:head>
 <div class="bg-base-300 p-2 flex justify-between align-middle relative">
     <div>
         <div class="dropdown hidden max-md:block z-10">

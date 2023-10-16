@@ -60,6 +60,10 @@ import { pb, uaccount } from "$lib/pocketbase";
     }
 </script>
 
+<svelte:head>
+    <title>User Profile - Root Cellar</title> 
+</svelte:head>
+
 <div class="m-auto w-[500px] bg-info p-4 card shadow">
     {#if $uaccount && udata}
         <h1 class="h1 my-4">User Data</h1>

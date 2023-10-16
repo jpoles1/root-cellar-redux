@@ -19,6 +19,11 @@
   }
   
 </script>
+
+<svelte:head>
+    <title>Login - Root Cellar</title> 
+</svelte:head>
+
 <div class="card bg-base-300 w-[80%] m-auto mt-20 p-5 prose text-center">
   <h1>Login Providers:</h1>
   <div class="flex flex-row align-middle justify-center w-full">

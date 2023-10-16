@@ -33,6 +33,10 @@
     });
 </script>
 
+<svelte:head>
+    <title>{recipe && recipe.title ? `${recipe.title} - ` : ""}Root Cellar</title> 
+</svelte:head>
+
 <div> 
     {#if recipe}
         <div class="flex flex-col justify-center mb-10">
