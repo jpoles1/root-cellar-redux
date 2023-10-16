@@ -99,6 +99,8 @@ For production server you can use `npm run serve`
 
 ## Gallery:
 
+![RootImport](https://github.com/jpoles1/root-cellar-redux/assets/366282/fe59537a-4f42-4327-9bc3-aa8253221059)
+
 ![Entering nutrition data into calculator](https://blog.jpoles1.com/wp-content/uploads/2023/10/RootNutrition-1.gif)
 
 
