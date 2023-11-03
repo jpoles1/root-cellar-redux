@@ -23,6 +23,9 @@ I've rewritten the entire project using SvelteKit + Pocketbase in order to unify
 - Archive or make recipes private
 - Fully self-hosted and dockerized: using SvelteKit, Pocketbase, and SQLite
 - Nutrition facts with calculator (beta). Calculator uses nutrition databases to help estimate the nutritional value of your recipes
+- TODO:
+    - Shopping list
+    - Meal Planner
 
 ## Project Structure
 
