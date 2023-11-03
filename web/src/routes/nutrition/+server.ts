@@ -12,7 +12,14 @@ export async function POST({ request, cookies }) {
 		//Remove all non-alphabetical characters
 		clean_ingredient = clean_ingredient.replaceAll(/[^a-zA-Z ]/g, '');
 		return nutritiondb().prepare(`
-			SELECT DISTINCT * FROM (SELECT DISTINCT * FROM food_search WHERE food_search MATCH '${clean_ingredient}' AND calories IS NOT NULL ORDER BY rank, brand IS NOT NULL, length(description) LIMIT 250) GROUP BY description, brand ORDER BY brand IS NOT NULL, length(description) LIMIT 100
+			SELECT DISTINCT * FROM (
+				SELECT DISTINCT * FROM food_search WHERE 
+				food_search MATCH '${clean_ingredient}' AND calories IS NOT NULL 
+				ORDER BY rank, brand IS NOT NULL, length(description) 
+				LIMIT 250
+			) GROUP BY description, brand 
+			ORDER BY brand IS NOT NULL, length(description) 
+			LIMIT 100
 		`).all();
 	})
 
