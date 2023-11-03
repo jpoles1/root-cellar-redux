@@ -278,7 +278,7 @@
                     {#if show_raw_instructions}
                         <AutoTextArea bind:value="{raw_instructions}" class="ingredient-notes-input w-full" on:input="{try_save_recipe}"/>
                         <div class="italic my-2 text-sm">
-                            Note: Please separate each instruction by a new line
+                            Note: Please separate each instruction by 2 new lines
                         </div>
                     {:else}
                         {#each recipe.instructions as instruct, i (instruct)}

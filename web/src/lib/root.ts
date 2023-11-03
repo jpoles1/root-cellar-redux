@@ -50,7 +50,7 @@ export const txt_to_ingredients = (txt: string): Ingredient[] => {
 
 export const txt_to_instructions = (txt: string): Instruction[] => {
     const instruction_list = txt
-        .split(/(?:[\n\t\r]| {3,})+/)
+        .split(/(?:[\n\r\t]{2,}| {3,})+/) // matches any sequence of 2+ newline (\n), tab (\t), carriage return (\r), or 3+ consecutive spaces
         .map(x => x.trim())
         .filter(x => x.length > 0)
         .map(
@@ -116,7 +116,7 @@ export class Recipe {
     }
     instructions_to_txt(): string {
         const raw_instruct = this.instructions.reduce((agg, inst, i): string => {
-            const inst_str = inst.instruction ? `\n${i+1}) ${inst.instruction}${inst.optional ? ' (Optional)' : ''}` : ''
+            const inst_str = inst.instruction ? `\n\n${i+1}) ${inst.instruction}${inst.optional ? ' (Optional)' : ''}` : ''
             return agg + inst_str
         }, "").trim()
         return raw_instruct
@@ -147,7 +147,7 @@ export const recipe_from_google_recipe = (google_recipe: GoogleRecipeSchema): Re
     }
     const extract_instructions = () => {
         const raw_instruct = google_recipe.recipeInstructions
-        const instructions = Array.isArray(raw_instruct) ? raw_instruct.map((instruction: any) => instruction.text || "").join('\n') : typeof raw_instruct === 'string' ? raw_instruct : ''
+        const instructions = Array.isArray(raw_instruct) ? raw_instruct.map((instruction: any) => instruction.text || "").join('\n\n') : typeof raw_instruct === 'string' ? raw_instruct : ''
         return instructions
     }
     const extract_tags = () => {
