@@ -289,7 +289,14 @@
                                 </div>
                                 <div class="instruction-order mr-2 h-[40px]">
                                     <!--Opt: <input type="checkbox" class="checkbox"/>-->
-                                    <button class="btn btn-xs" on:click="{() => {instruct.optional = !instruct.optional}}">{instruct.optional ? 'Optional' : 'Required'}</button>
+                                    <button class="btn btn-xs" on:click="{() => {instruct.optional = !instruct.optional}}">
+                                        {instruct.optional ? 'Optional' : 'Required'}
+                                    </button>
+                                </div>
+                                <div class="instruction-order mr-2 h-[40px] flex flex-col justify-center tooltip tooltip-left" data-tip="Insert instruction above">
+                                    <button class="btn btn-xs items-center" on:click="{() => { recipe.instructions = recipe.instructions.slice(0, i).concat([new Instruction()], recipe.instructions.slice(i+1))}}">
+                                        <Icon icon="fluent-mdl2:insert-rows-above" class="" />
+                                    </button>
                                 </div>
                                 <AutoTextArea bind:value="{instruct.instruction}" placeholder="Instructions..." class="ingredient-notes-input p-1" on:keyup="{(e) => { instruction_delete_watch(i, e) }}" on:input="{try_save_recipe}"/>
                             </div>
