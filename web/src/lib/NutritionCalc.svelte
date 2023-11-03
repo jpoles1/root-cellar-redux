@@ -142,6 +142,9 @@
         <div class="flex flex-row items-center space-x-2">
             <span>mL</span> <input type="checkbox" class="toggle" bind:checked="{enable_serving_ml_to_kitchen}" /> <span>Kitchen</span>
         </div>
+        <div class="border border-[#888] font-[#888] rounded p-2 italic flex flex-row items-center space-x-2">
+            1/4 cup = 4 tbsp &nbsp;|&nbsp;  1 tbsp = 3 tsp  &nbsp;|&nbsp;  2 tbsp = 1 fl oz
+        </div>
     </div>
     <table class="table table-auto">
         <thead>
