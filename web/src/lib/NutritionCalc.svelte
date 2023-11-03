@@ -191,25 +191,25 @@
                         <td>
                             <NumInput bind:value={serving_mult[i]} class="w-[80px] border" placeholder="" step="{0.25}" />
                         </td>
-                        <td>
+                        <td class="p-2">
                             {nlook(i).calories != undefined ? (nlook(i).calories * (serving_mult[i] != undefined ? serving_mult[i] : 1)).toFixed(0) : "?"}
                         </td>
-                        <td>
+                        <td class="p-2">
                             {nlook(i).fat != undefined ? (nlook(i).fat * (serving_mult[i] != undefined ? serving_mult[i] : 1)).toFixed(0) : "? "}g
                         </td>
-                        <td>
+                        <td class="p-2">
                             {nlook(i).protein != undefined ? (nlook(i).protein * (serving_mult[i] != undefined ? serving_mult[i] : 1)).toFixed(0) : "? "}g
                         </td>
-                        <td>
+                        <td class="p-2">
                             {nlook(i).carbs != undefined ? (nlook(i).carbs * (serving_mult[i] != undefined ? serving_mult[i] : 1)).toFixed(0) : "? "}g
                         </td>
-                        <td>
+                        <td class="p-2">
                             {nlook(i).fiber != undefined ? (nlook(i).fiber * (serving_mult[i] != undefined ? serving_mult[i] : 1)).toFixed(0) : "? "}g
                         </td>
-                        <td>
+                        <td class="p-2">
                             {nlook(i).sugar != undefined ? (nlook(i).sugar * (serving_mult[i] != undefined ? serving_mult[i] : 1)).toFixed(0) : "? "}g
                         </td>
-                        <td>
+                        <td class="p-2">
                             {nlook(i).sodium != undefined ? (nlook(i).sodium * (serving_mult[i] != undefined ? serving_mult[i] : 1)).toFixed(0) : "? "}mg
                         </td>
                     </tr>
@@ -225,7 +225,10 @@
                     </td>
                     {/each}
                 </tr>
-                <button class="btn btn-primary mt-2" on:click={recalculate_nutrition}>Recalculate Nutrition</button>
+                <div class="flex space-x-6 items-center">
+                    <button class="btn btn-primary mt-2" on:click={recalculate_nutrition}>Recalculate Nutrition</button>
+                    <div class="pt-4"><NumInput bind:value={recipe.servings} class="w-[120px]" placeholder="# of Servings" step="{1}" alwaysfloatplaceholder /></div>
+                </div>
             {/if}
         </tbody>
     </table>
@@ -235,7 +238,7 @@
     td, th {
         text-align: center;
         border: 1px solid #222;
-        padding: 8px;
+        padding: 4px;
     }
     .tooltip::before {
         white-space: break-spaces;
